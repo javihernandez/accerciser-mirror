@@ -13,11 +13,11 @@ All rights reserved. This program and the accompanying materials are made
 available under the terms of the BSD which accompanies this distribution, and 
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
-import pygtk
-pygtk.require('2.0')
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+
+from gi.repository import Gtk as gtk
 import gobject
-import gtk.gdk
 import os, sys, locale
 from icons import getIcon
 import os
@@ -96,7 +96,7 @@ class Main(Tools):
       action = main_actions.get_action(action_name)
       ui_manager.uimanager.add_ui(ui_manager.uimanager.new_merge_id(), 
                                   menu_path, action_name, action_name, 
-                                  gtk.UI_MANAGER_MENUITEM, False)
+                                  gtk.UIManagerItemType.MENUITEM, False)
 
 
     self.last_focused = None
@@ -129,21 +129,21 @@ class Main(Tools):
       message = _('Accerciser could not see the applications on your desktop.  '
                   'You must enable desktop accessibility to fix this problem.  '
                   'Do you want to enable it now?')
-      dialog = gtk.MessageDialog(self.window,type=gtk.MESSAGE_ERROR,
-                                 buttons=gtk.BUTTONS_YES_NO, 
+      dialog = gtk.MessageDialog(self.window,type=gtk.MessageType.ERROR,
+                                 buttons=gtk.ButtonsType.YES_NO, 
                                  message_format=message)
       dialog.connect('response', self._onNoA11yResponse)
       dialog.show_all()
 
   def _onNoA11yResponse(self, dialog, response_id):
     dialog.destroy()
-    if response_id == gtk.RESPONSE_YES:
+    if response_id == gtk.ResponseType.YES:
       cl = gconf.client_get_default()
       cl.set_bool('/desktop/gnome/interface/accessibility', True)
       dialog = gtk.MessageDialog(
         self.window,
-        type=gtk.MESSAGE_INFO,
-        buttons=gtk.BUTTONS_OK, 
+        type=gtk.MessageType.INFO,
+        buttons=gtk.ButtonsType.OK, 
         message_format=_('Note: Changes only take effect after logout.'))
       dialog.connect('response', lambda dia, resp: dia.destroy())
       dialog.show_all()

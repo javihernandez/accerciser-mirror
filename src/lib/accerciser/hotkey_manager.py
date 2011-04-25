@@ -10,7 +10,14 @@ All rights reserved. This program and the accompanying materials are made
 available under the terms of the BSD which accompanies this distribution, and 
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
-import gtk, gconf
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+
+import gconf
 from i18n import _
 import pyatspi
 
@@ -35,9 +42,9 @@ def _charToKeySym(key):
   @rtype: long
   '''
   try:
-    rv = gtk.gdk.unicode_to_keyval(ord(key))
+    rv = gdk.unicode_to_keyval(ord(key))
   except:
-    rv = getattr(gtk.keysyms, key)
+    rv = getattr(gdk, 'KEY_%s' % key)
   return rv
 
 class HotkeyManager(gtk.ListStore):
@@ -82,7 +89,9 @@ class HotkeyManager(gtk.ListStore):
     @param modifiers: The modifiers that were depressed during the keystroke.
     @type modifiers: integer
     '''
-    km = gtk.gdk.keymap_get_default()
+    keymap = gdk.Keymap()
+    km = keymap.get_default()
+    
     callback = None
     for combo in self:
       entries = km.get_entries_for_keyval(combo[COL_KEYPRESS])
@@ -243,22 +252,23 @@ class HotkeyTreeView(gtk.TreeView):
     crt = gtk.CellRendererToggle()
     tvc = gtk.TreeViewColumn(_('Alt'))
     tvc.pack_start(crt, True)
-    tvc.set_cell_data_func(crt, self._modCellFunc, gtk.gdk.MOD1_MASK)
-    crt.connect('toggled', self._onModToggled, gtk.gdk.MOD1_MASK)
+    tvc.set_cell_data_func(crt, self._modCellFunc, gdk.ModifierType.MOD1_MASK)
+    crt.connect('toggled', self._onModToggled, gdk.ModifierType.MOD1_MASK)
     self.append_column(tvc)
 
     crt = gtk.CellRendererToggle()
     tvc = gtk.TreeViewColumn(_('Ctrl'))
     tvc.pack_start(crt, True)
-    tvc.set_cell_data_func(crt, self._modCellFunc, gtk.gdk.CONTROL_MASK)
-    crt.connect('toggled', self._onModToggled, gtk.gdk.CONTROL_MASK)
+    tvc.set_cell_data_func(crt, self._modCellFunc, \
+                           gdk.ModifierType.CONTROL_MASK)
+    crt.connect('toggled', self._onModToggled, gdk.ModifierType.CONTROL_MASK)
     self.append_column(tvc)
 
     crt = gtk.CellRendererToggle()
     tvc = gtk.TreeViewColumn(_('Shift'))
     tvc.pack_start(crt, True)
-    tvc.set_cell_data_func(crt, self._modCellFunc, gtk.gdk.SHIFT_MASK)
-    crt.connect('toggled', self._onModToggled, gtk.gdk.SHIFT_MASK)
+    tvc.set_cell_data_func(crt, self._modCellFunc, gdk.ModifierType.SHIFT_MASK)
+    crt.connect('toggled', self._onModToggled, gdk.ModifierType.SHIFT_MASK)
     self.append_column(tvc)
   
   def _translateDataFunc(self, column, cell, model, iter, column_id):
@@ -307,7 +317,7 @@ class HotkeyTreeView(gtk.TreeView):
     '''
     if model[iter][COL_KEYPRESS] > 0:
       cell.set_property('text', 
-                        gtk.gdk.keyval_name(model[iter][COL_KEYPRESS]))
+                        gdk.keyval_name(model[iter][COL_KEYPRESS]))
       cell.set_property('sensitive', True)
     else:
       cell.set_property('text', '<select key>')

@@ -1,4 +1,10 @@
-import gtk, atk, os
+import gi
+gi.require_version('Gtk', '2.0')
+
+from gi.repository import Gtk as gtk
+
+import atk
+import os
 from xml.dom.minidom import getDOMImplementation, parse, Element
 from i18n import _
 from pyatspi import getPath
@@ -71,12 +77,12 @@ class BookmarkStore(gtk.ListStore):
       action_name = action.get_name()
       ui_manager.uimanager.add_ui(merge_id, ui_manager.BOOKMARKS_MENU_PATH, 
                             action_name, action_name, 
-                            gtk.UI_MANAGER_MENUITEM, False)
+                            gtk.UIManagerItemType.MENUITEM, False)
 
     ui_manager.uimanager.add_ui(ui_manager.uimanager.new_merge_id(), 
                                 ui_manager.BOOKMARKS_MENU_PATH, 
                                 'sep', None, 
-                                gtk.UI_MANAGER_SEPARATOR, False)
+                                gtk.UIManagerItemType.SEPARATOR, False)
 
   def _onAddBookmark(self, action):
     '''
@@ -90,7 +96,7 @@ class BookmarkStore(gtk.ListStore):
     bookmark = self[iter][0]
     dialog = self._NewBookmarkDialog(bookmark)
     response_id = dialog.run()
-    if response_id == gtk.RESPONSE_OK:
+    if response_id == gtk.ResponseType.OK:
       bookmark.title, bookmark.app, bookmark.path = dialog.getFields()
     else:
       self.remove(iter)
@@ -148,7 +154,7 @@ class BookmarkStore(gtk.ListStore):
     self._bookmarks_action_group.add_action(bookmark)
     ui_manager.uimanager.add_ui(merge_id, 
                                 '/MainMenuBar/Bookmarks', name, name, 
-                                gtk.UI_MANAGER_MENUITEM, False)
+                                gtk.UIManagerItemType.MENUITEM, False)
     self[iter][0] = bookmark
     return iter
 
@@ -321,15 +327,15 @@ class BookmarkStore(gtk.ListStore):
       @type bookmarks_store: L{BookmarkStore}
       '''
       gtk.Dialog.__init__(self, _('Edit Bookmarks...'), 
-                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+                          buttons=(gtk.STOCK_CLOSE, gtk.ResponseType.CLOSE))
       self.set_default_size(480,240)
       self.connect('response', self._onResponse)
       hbox = gtk.HBox()
       hbox.set_spacing(3)
       tv = self._createTreeView(bookmarks_store)
       sw = gtk.ScrolledWindow()
-      sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-      sw.set_shadow_type(gtk.SHADOW_IN)
+      sw.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
+      sw.set_shadow_type(gtk.ShadowType.IN)
       sw.add(tv)
       hbox.pack_start(sw)
       button_vbox = gtk.VBox()
@@ -510,10 +516,10 @@ class BookmarkStore(gtk.ListStore):
       @type bookmark: L{BookmarkStore._Bookmark}
       '''
       gtk.Dialog.__init__(self, _('Add Bookmark...'))
-      self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-      ok_button = self.add_button(gtk.STOCK_ADD, gtk.RESPONSE_OK)
+      self.add_button(gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL)
+      ok_button = self.add_button(gtk.STOCK_ADD, gtk.ResponseType.OK)
       ok_button.set_sensitive(False)
-      self.set_default_response(gtk.RESPONSE_OK)
+      self.set_default_response(gtk.ResponseType.OK)
       table = gtk.Table(3, 2, False)
       table.set_row_spacings(3)
       table.set_col_spacings(3)
@@ -540,7 +546,7 @@ class BookmarkStore(gtk.ListStore):
         entry_acc = entry.get_accessible()
         label_acc.add_relationship(atk.RELATION_LABEL_FOR, entry_acc)
         entry_acc.add_relationship(atk.RELATION_LABELLED_BY, label_acc)
-        table.attach(gtk.Label(label), 0, 1, i, i+1, gtk.FILL, 0)
+        table.attach(gtk.Label(label), 0, 1, i, i+1, gtk.AttachOptions.FILL, 0)
         table.attach(entry, 1, 2, i, i+1)
       self.show_all()
 

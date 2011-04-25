@@ -10,7 +10,13 @@ All rights reserved. This program and the accompanying materials are made
 available under the terms of the BSD which accompanies this distribution, and 
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+
 import pyatspi
 import gobject
 import os.path
@@ -18,7 +24,6 @@ import gettext, os, sys, locale
 from accerciser.plugin import ViewportPlugin
 from accerciser.i18n import _, N_, DOMAIN
 import pango
-from gtk import keysyms, gdk
 
 UI_FILE = os.path.join(os.path.dirname(__file__), 
                        'event_monitor.ui')
@@ -60,13 +65,17 @@ class EventMonitor(ViewportPlugin):
     '''
     self.global_hotkeys = [(N_('Highlight last event entry'),
                             self._onHighlightEvent,
-                            keysyms.e, gdk.MOD1_MASK | gdk.CONTROL_MASK),
+                            gdk.KEY_e, gdk.ModifierType.MOD1_MASK | \
+                                       gdk.ModifierType.CONTROL_MASK),
                            (N_('Start/stop event recording'),
                             self._onStartStop,
-                            keysyms.r, gdk.MOD1_MASK | gdk.CONTROL_MASK),
+                            gdk.KEY_r, gdk.ModifierType.MOD1_MASK | \
+                                       gdk.ModifierType.CONTROL_MASK),
                            (N_('Clear event log'),
                             self._onClearlog,
-                            keysyms.t, gdk.MOD1_MASK | gdk.CONTROL_MASK)]
+                            gdk.KEY_t, gdk.ModifierType.MOD1_MASK | \
+                                       gdk.ModifierType.CONTROL_MASK)]
+
     self.source_filter = None
     self.main_xml = gtk.Builder()
     self.main_xml.set_translation_domain(DOMAIN)
@@ -365,11 +374,11 @@ class EventMonitor(ViewportPlugin):
     @param widget: The widget that received event.
     @type widget: gtk.Widget
     @param event: The event object.
-    @type event: gtk.gdk.Event
+    @type event: gdk.Event
     @param iter: The text iter that was clicked.
     @type iter: gtk.TextIter
     '''
-    if event.type == gtk.gdk.BUTTON_RELEASE and \
+    if event.type == gdk.EventType.BUTTON_RELEASE and \
            event.button == 1 and not self.monitor_buffer.get_has_selection():
       self.node.update(tag.get_data('acc'))
 
@@ -381,11 +390,11 @@ class EventMonitor(ViewportPlugin):
     @param textview: Textview that was pressed.
     @type textview: gtk.TextView
     @param event: Event object.
-    @type event: gtk.gdk.Event
+    @type event: gdk.Event
     '''
-    if event.keyval in (gtk.keysyms.Return, 
-                        gtk.keysyms.KP_Enter,
-                        gtk.keysyms.space):
+    if event.keyval in (gdk.KEY_Return, 
+                        gdk.KEY_KP_Enter,
+                        gdk.KEY_space):
       buffer = textview.get_buffer()
       iter = buffer.get_iter_at_mark(buffer.get_insert())
       acc = None
@@ -402,20 +411,20 @@ class EventMonitor(ViewportPlugin):
     @param textview: Monitors text view.
     @type textview: gtk.TextView
     @param event: Event object
-    @type event: gtk.gdk.Event
+    @type event: gdk.Event
     
     @return: Return False so event continues in callback chain.
     @rtype: boolean
     '''
-    x, y = textview.window_to_buffer_coords(gtk.TEXT_WINDOW_WIDGET,
+    x, y = textview.window_to_buffer_coords(gtk.TextWindowType.WIDGET,
                                              int(event.x), int(event.y))
     iter = textview.get_iter_at_location(x, y)
-    cursor = gtk.gdk.Cursor(gtk.gdk.XTERM)
+    cursor = gdk.Cursor(gdk.CursorType.XTERM)
     for tag in iter.get_tags():
       if tag.get_data('islink'):
-        cursor = gtk.gdk.Cursor(gtk.gdk.HAND2)
+        cursor = gdk.Cursor(gdk.CursorType.HAND2)
         break
-    textview.get_window(gtk.TEXT_WINDOW_TEXT).set_cursor(cursor)
+    textview.get_window(gtk.TextWindowType.TEXT).set_cursor(cursor)
     textview.window.get_pointer()
     return False
 
@@ -440,14 +449,14 @@ class EventMonitor(ViewportPlugin):
     '''
     save_dialog = gtk.FileChooserDialog(
       'Save monitor output',
-      action=gtk.FILE_CHOOSER_ACTION_SAVE,
-      buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-               gtk.STOCK_OK, gtk.RESPONSE_OK))
+      action=gtk.FileChooserAction.SAVE,
+      buttons=(gtk.ButtonsType.CANCEL, gtk.ResponseType.CANCEL,
+               gtk.ButtonsType.OK, gtk.ResponseType.OK))
     save_dialog.set_do_overwrite_confirmation(True)
-    save_dialog.set_default_response(gtk.RESPONSE_OK)
+    save_dialog.set_default_response(gtk.ResponseType.OK)
     response = save_dialog.run()
     save_dialog.show_all()
-    if response == gtk.RESPONSE_OK:
+    if response == gtk.ResponseType.OK:
       save_to = open(save_dialog.get_filename(), 'w')
       save_to.write(
         self.monitor_buffer.get_text(self.monitor_buffer.get_start_iter(),

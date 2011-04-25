@@ -11,8 +11,11 @@
 
 # Headers in this file shall remain intact.
 
-from gtk import keysyms
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
 from Queue import Queue
 from time import time
 import pyatspi
@@ -46,10 +49,10 @@ class ScriptFactory(object):
   '''
   intepreter_line = '#!/usr/bin/python'
   import_line = ''
-  MODIFIERS = [keysyms.Control_L, keysyms.Control_R, 
-               keysyms.Alt_L, keysyms.Alt_R, 
-               keysyms.Super_L, keysyms.Super_R,
-               keysyms.Shift_L, keysyms.Shift_R]
+  MODIFIERS = [gdk.KEY_Control_L, gdk.KEY_Control_R, 
+               gdk.KEY_Alt_L, gdk.KEY_Alt_R, 
+               gdk.KEY_Super_L, gdk.KEY_Super_R,
+               gdk.KEY_Shift_L, gdk.KEY_Shift_R]
                
   def __init__(self):
     '''
@@ -137,9 +140,9 @@ class Level2SequenceFactory(SequenceFactory):
     if isinstance(event, pyatspi.event.DeviceEvent):
       # If it's a fake one, then it is a global WM hotkey, no need for context.
       self._prependContext()
-    if event.modifiers in (0, gtk.gdk.SHIFT_MASK) and \
-          gtk.gdk.keyval_to_unicode(event.id):
-      self.typed_text += unichr(gtk.gdk.keyval_to_unicode(event.id))
+    if event.modifiers in (0, gdk.ModifierType.SHIFT_MASK) and \
+          gdk.keyval_to_unicode(event.id):
+      self.typed_text += unichr(gdk.keyval_to_unicode(event.id))
     else:
       if self.frame_name:
         if isinstance(event, pyatspi.event.DeviceEvent):
@@ -262,9 +265,9 @@ class DogtailFactory(ScriptFactory):
     if event.id in self.MODIFIERS or \
           event.event_string.startswith('ISO'):
       return
-    if event.modifiers in (0, gtk.gdk.SHIFT_MASK) and \
-          gtk.gdk.keyval_to_unicode(event.id):
-      self.typed_text += unichr(gtk.gdk.keyval_to_unicode(event.id))
+    if event.modifiers in (0, gdk.ModifierType.SHIFT_MASK) and \
+          gdk.keyval_to_unicode(event.id):
+      self.typed_text += unichr(gdk.keyval_to_unicode(event.id))
     else:
       if self.app_name:
         self.commands_queue.put_nowait('focus.application("%s")\n' % \
@@ -315,9 +318,9 @@ class LDTPFactory(DogtailFactory):
     if event.id in self.MODIFIERS or \
           event.event_string.startswith('ISO'):
       return
-    if event.modifiers in (0, gtk.gdk.SHIFT_MASK) and \
-          gtk.gdk.keyval_to_unicode(event.id):
-      self.typed_text += unichr(gtk.gdk.keyval_to_unicode(event.id))
+    if event.modifiers in (0, gdk.ModifierType.SHIFT_MASK) and \
+          gdk.keyval_to_unicode(event.id):
+      self.typed_text += unichr(gdk.keyval_to_unicode(event.id))
     else:
       if self.frame_name:
         self.commands_queue.put_nowait('waittillguiexist("%s")\n' % \

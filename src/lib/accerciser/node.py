@@ -11,8 +11,13 @@ All rights reserved. This program and the accompanying materials are made
 available under the terms of the BSD which accompanies this distribution, and 
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
-import gtk
-import gtk.gdk
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+
 import pyatspi
 import gobject
 import string
@@ -144,14 +149,14 @@ class Node(gobject.GObject, Tools):
     self.max_blinks = times
     self.blinks = 0
     # get info for drawing higlight rectangles
-    display = gtk.gdk.display_get_default()
+    display = gdk.Display.get_default()
     screen = display.get_default_screen()
     self.root = screen.get_root_window()
     self.gc = self.root.new_gc()
-    self.gc.set_subwindow(gtk.gdk.INCLUDE_INFERIORS)
-    self.gc.set_function(gtk.gdk.INVERT)
-    self.gc.set_line_attributes(3, gtk.gdk.LINE_ON_OFF_DASH, gtk.gdk.CAP_BUTT, 
-                                gtk.gdk.JOIN_MITER)
+    self.gc.set_subwindow(gdk.SubwindowMode.INCLUDE_INFERIORS)
+    self.gc.set_function(gdk.Function.INVERT)
+    self.gc.set_line_attributes(3, gdk.LineStyle.ON_OFF_DASH, \
+                                gdk.CapStyle.BUTT, gdk.JoinStyle.MITER)
     self.inv = gtk.Invisible()
     self.inv.set_screen(screen)
     gobject.timeout_add(30, self._drawRectangle)
@@ -201,7 +206,7 @@ class _HighLight(gtk.Window):
                stroke_width, padding=0):
 
     # Initialize window.
-    gtk.Window.__init__(self, gtk.WINDOW_POPUP)
+    gtk.Window.__init__(self, gtk.WindowType.POPUP)
 
     # Normalize position for stroke and padding.
     self.x, self.y = x - padding, y - padding
@@ -216,7 +221,7 @@ class _HighLight(gtk.Window):
       self.set_colormap(colormap)
     else:
       # Take a screenshot for compositing on the client side.
-      self.root = gtk.gdk.get_default_root_window().get_image(
+      self.root = gdk.get_default_root_window().get_image(
         self.x, self.y, self.w, self.h)
 
     # Place window, and resize it, and set proper properties.

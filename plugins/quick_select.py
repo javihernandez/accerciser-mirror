@@ -1,6 +1,13 @@
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+
 from accerciser.plugin import Plugin
 from accerciser.i18n import N_, _
-import gtk
+
 import pyatspi
 import wnck
 
@@ -19,12 +26,12 @@ class QuickSelect(Plugin):
     '''
     self.global_hotkeys = [(N_('Inspect last focused accessible'),
                             self._inspectLastFocused, 
-                            gtk.keysyms.a,
-                            gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK),
+                            gdk.KEY_a, gdk.ModifierType.CONTROL_MASK | \
+                                       gdk.ModifierType.MOD1_MASK),
                            (N_('Inspect accessible under mouse'),
                             self._inspectUnderMouse, 
-                            gtk.keysyms.question,
-                            gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK)]
+                            gdk.KEY_question, gdk.ModifierType.CONTROL_MASK | \
+                                              gdk.ModifierType.MOD1_MASK)]
 
     pyatspi.Registry.registerEventListener(self._accEventFocusChanged, 
                                'object:state-changed')
@@ -68,7 +75,7 @@ class QuickSelect(Plugin):
     '''
     Inspect accessible of widget under mouse.
     '''
-    display = gtk.gdk.Display(gtk.gdk.get_display())
+    display = gdk.Display(gdk.get_display())
     screen, x, y, flags =  display.get_pointer()
     del screen # A workaround http://bugzilla.gnome.org/show_bug.cgi?id=593732
 

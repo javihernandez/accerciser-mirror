@@ -11,9 +11,14 @@
 
 # Headers in this file shall remain intact.
 
+import gi
+gi.require_version('Gtk', '2.0')
+from gi.repository import Gtk as gtk
+
 import script_factory
-import gtk, gobject
-import gtksourceview, pango
+import gobject
+import gtksourceview2 as gtksourceview
+import pango
 from Queue import Queue
 from macaroon.playback import MacroSequence
 
@@ -120,7 +125,7 @@ class MacroPreview(gtk.Window):
     self.set_border_width(6)
     self.connect('delete-event', self._onDelete)
     self.script_buffer = script_buffer
-    text_view = gtksourceview.SourceView(self.script_buffer)
+    text_view = gtksourceview.View(self.script_buffer)
     text_view.set_editable(True)
     text_view.set_cursor_visible(True)
     text_view.modify_font(pango.FontDescription('Mono'))
@@ -250,7 +255,7 @@ class MacroPreview(gtk.Window):
     else:
       return False
 
-class ScriptBuffer(gtksourceview.SourceBuffer):
+class ScriptBuffer(gtksourceview.Buffer):
   __gproperties__ = {
     'recording': (gobject.TYPE_BOOLEAN, 
                   'Is recording', 
@@ -259,8 +264,8 @@ class ScriptBuffer(gtksourceview.SourceBuffer):
   factory_mapping = {'Level1' : script_factory.Level1SequenceFactory,
                      'Level2' : script_factory.Level2SequenceFactory}
   def __init__(self, uimanager):
-    gtksourceview.SourceBuffer.__init__(self)
-    lm = gtksourceview.SourceLanguagesManager()
+    gtksourceview.Buffer.__init__(self)
+    lm = gtksourceview.LanguageManager()
     lang = lm.get_language_from_mime_type('text/x-python')
     self.set_language(lang)
     self.set_highlight(True)

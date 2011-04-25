@@ -11,12 +11,14 @@
 
 # Headers in this file shall remain intact.
 
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+
+from gi.repository import Gtk as gtk
 from gnome import program_get, url_show
 
 _ = lambda x: x
-gtk.about_dialog_set_url_hook(lambda dialog, url, data: url_show(url), None)
-
+gtk.AboutDialog.set_url_hook(lambda dialog, url, data: url_show(url), None)
 
 class MacaroonAboutDialog(gtk.AboutDialog):
   '''

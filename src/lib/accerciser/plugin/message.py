@@ -11,7 +11,13 @@ available under the terms of the BSD which accompanies this distribution, and
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
-import gtk, gobject, pango
+import gi
+gi.require_version('Gtk', '2.0')
+
+from gi.repository import Gtk as gtk
+
+import gobject
+import pango
 from accerciser.i18n import _
 
 class MessageManager(gobject.GObject):
@@ -92,7 +98,7 @@ class MessageManager(gobject.GObject):
     @param plugin_class: The plugin class of the failed plugin.
     @type plugin_class: type
     '''
-    if response_id == gtk.RESPONSE_APPLY:
+    if response_id == gtk.ResponseType.APPLY:
       self.emit('plugin-reload-request', message, plugin_class)
 
   def newModuleError(self, module, path, error_message, details):
@@ -132,7 +138,7 @@ class MessageManager(gobject.GObject):
     @param path: Failed module's path.
     @type path: string
     '''
-    if response_id == gtk.RESPONSE_APPLY:
+    if response_id == gtk.ResponseType.APPLY:
       self.emit('module-reload-request', message, module, path)
 
   class MessageTab(gtk.ScrolledWindow):
@@ -273,7 +279,7 @@ class PluginErrorMessage(PluginMessage):
     self.vbox.pack_start(hbox, False, False)
     image = gtk.Image()
     image.set_from_stock(gtk.STOCK_DIALOG_WARNING,
-                         gtk.ICON_SIZE_SMALL_TOOLBAR)
+                         gtk.IconSize.SMALL_TOOLBAR)
     hbox.pack_start(image, False, False)
     label = gtk.Label()
     label.set_ellipsize(pango.ELLIPSIZE_END)
@@ -284,8 +290,8 @@ class PluginErrorMessage(PluginMessage):
     label.set_ellipsize(pango.ELLIPSIZE_END)
     label.set_selectable(True)
     self.vbox.add(label)
-    self.add_button(gtk.STOCK_CLEAR, gtk.RESPONSE_CLOSE)
-    self.add_button(gtk.STOCK_REFRESH, gtk.RESPONSE_APPLY)
+    self.add_button(gtk.STOCK_CLEAR, gtk.ResponseType.CLOSE)
+    self.add_button(gtk.STOCK_REFRESH, gtk.ResponseType.APPLY)
     self.connect('response', self._onResponse)
   
   def _onResponse(self, plugin_message, response_id):
@@ -297,5 +303,5 @@ class PluginErrorMessage(PluginMessage):
     @param response_id: The response ID
     @type response_id: integer
     '''
-    if response_id == gtk.RESPONSE_CLOSE:
+    if response_id == gtk.ResponseType.CLOSE:
       plugin_message.destroy()

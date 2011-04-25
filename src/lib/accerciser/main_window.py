@@ -1,4 +1,11 @@
-import gtk, gconf
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+
+import gconf
 from plugin import PluginView
 from i18n import _, N_
 from accessible_treeview import *
@@ -80,8 +87,8 @@ class AccerciserMainWindow(gtk.Window):
     self._vpaned.add2(self.pluginview2)
     self._hpaned.add2(self.pluginview1)
     sw = gtk.ScrolledWindow()
-    sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    sw.set_shadow_type(gtk.SHADOW_IN)
+    sw.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
+    sw.set_shadow_type(gtk.ShadowType.IN)
     self.treeview = AccessibleTreeView(node)
     ui_manager.uimanager.insert_action_group(self.treeview.action_group, 0)
     for action in self.treeview.action_group.list_actions():
@@ -89,13 +96,13 @@ class AccerciserMainWindow(gtk.Window):
       action_name = action.get_name()
       ui_manager.uimanager.add_ui(merge_id, ui_manager.TREE_ACTIONS_PATH, 
                                   action_name, action_name, 
-                                  gtk.UI_MANAGER_MENUITEM, False)
+                                  gtk.UIManagerItemType.MENUITEM, False)
     
     merge_id = ui_manager.uimanager.new_merge_id()
     action_name = self.treeview.refresh_current_action.get_name()
     ui_manager.uimanager.add_ui(merge_id, ui_manager.POPUP_MENU_PATH,
                                  action_name, action_name,
-                                 gtk.UI_MANAGER_MENUITEM, False)
+                                 gtk.UIManagerItemType.MENUITEM, False)
 
     sw.add(self.treeview)
     self._hpaned.add1(sw)
@@ -144,10 +151,10 @@ class AccerciserMainWindow(gtk.Window):
     @param event: The event that accured.
     @type event: L{gtk.gdk.Event}
     '''
-    if event.state & gtk.gdk.MOD1_MASK and \
-          event.keyval in xrange(gtk.gdk.keyval_from_name('0'), 
-                                 gtk.gdk.keyval_from_name('9')):
-      tab_num = event.keyval - gtk.gdk.keyval_from_name('0') or 10
+    if event.state & gdk.ModifierType.MOD1_MASK and \
+          event.keyval in xrange(gdk.keyval_from_name('0'), 
+                                 gdk.keyval_from_name('9')):
+      tab_num = event.keyval - gdk.keyval_from_name('0') or 10
       pages_count1 = self.pluginview1.getNVisiblePages()
       pages_count2 = self.pluginview2.getNVisiblePages()
       if pages_count1 + pages_count2 < tab_num:

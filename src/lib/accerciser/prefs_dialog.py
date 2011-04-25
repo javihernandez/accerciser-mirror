@@ -11,7 +11,13 @@ available under the terms of the BSD which accompanies this distribution, and
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+
 from i18n import _
 import atk
 import gconf
@@ -32,7 +38,7 @@ class AccerciserPreferencesDialog(gtk.Dialog):
     @type hotkeys_view: L{HotkeyTreeView}
     '''
     gtk.Dialog.__init__(self, _('accerciser Preferences'), 
-                        buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+                        buttons=(gtk.STOCK_CLOSE, gtk.ResponseType.CLOSE))
     self.connect('response', self._onResponse)
     self.set_default_size(500,250)
     notebook = gtk.Notebook()
@@ -41,8 +47,8 @@ class AccerciserPreferencesDialog(gtk.Dialog):
                           (hotkeys_view, _('Global Hotkeys'))]:
       if view is not None:
         sw = gtk.ScrolledWindow()
-        sw.set_shadow_type(gtk.SHADOW_IN)
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        sw.set_shadow_type(gtk.ShadowType.IN)
+        sw.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
         sw.add(view)
         notebook.append_page(sw, gtk.Label(section))
     
@@ -97,8 +103,8 @@ class _HighlighterView(gtk.Alignment):
 
     for label, control, row in zip(labels, controls, range(3)):
       label.set_alignment(0, 0.5)
-      table.attach(label, 0, 1, row, row + 1, gtk.FILL)
-      table.attach(control, 1, 2, row, row + 1, gtk.FILL)
+      table.attach(label, 0, 1, row, row + 1, gtk.AttachOptions.FILL)
+      table.attach(control, 1, 2, row, row + 1, gtk.AttachOptions.FILL)
 
     for label, control in zip(map(lambda x: x.get_accessible(),labels),
                               map(lambda x: x.get_accessible(),controls)):
@@ -143,7 +149,7 @@ class _HighlighterView(gtk.Alignment):
     ColorButton derivative with useful methods for us.
     '''
     def __init__(self, color, alpha):
-      gtk.ColorButton.__init__(self, gtk.gdk.color_parse(color))
+      gtk.ColorButton.__init__(self, gdk.color_parse(color))
       self.set_use_alpha(True)
       self.set_alpha(int(alpha*0xffff))
                                

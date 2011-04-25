@@ -11,7 +11,13 @@ available under the terms of the BSD which accompanies this distribution, and
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+
 import gobject
 from base_plugin import Plugin
 from accerciser.tools import *
@@ -94,7 +100,7 @@ class PluginView(gtk.Notebook):
     @param event: Event object.
     @type event: gtk.dk.Event
     '''
-    if event.keyval == gtk.keysyms.Menu and \
+    if event.keyval == gdk.KEY_Menu and \
           self.get_property('has-focus'):
       page_num = self.get_current_page()
       child = self.get_nth_page(page_num)
@@ -115,7 +121,7 @@ class PluginView(gtk.Notebook):
     '''
     for child in self.getPlugins():
       tab = self.get_tab_label(child)
-      if tab != None and tab.flags() & gtk.MAPPED:
+      if tab != None and tab.flags() & gtk.WidgetFlags.MAPPED:
         x, y, w, h = self.getTabAlloc(tab)
         if event_x >= x and \
               event_x <= x + w and \
@@ -137,7 +143,7 @@ class PluginView(gtk.Notebook):
     gdk_window = widget.window
     origin_x, origin_y = gdk_window.get_origin()
     x, y, width, height = widget.get_allocation()
-    if widget.flags() & gtk.NO_WINDOW:
+    if widget.flags() & gtk.WidgetFlags.NO_WINDOW:
       origin_x += x
       origin_y += y
     return origin_x, origin_y, width, height
@@ -286,7 +292,7 @@ class PluginViewWindow(gtk.Window, Tools):
     self.connect('key_press_event', self._onKeyPress)
     self.plugin_view.connect_after('page_removed', self._onPluginRemoved)
     self.set_title(view_name)
-    self.set_position(gtk.WIN_POS_MOUSE)
+    self.set_position(gtk.WindowPosition.MOUSE)
     self.show_all()
     self.connect('size-allocate', self._onResize)
 
@@ -332,10 +338,10 @@ class PluginViewWindow(gtk.Window, Tools):
     @param event: Event object
     @type event: gtk.gdk.Event
     '''
-    if event.state & gtk.gdk.MOD1_MASK and \
-          event.keyval in xrange(gtk.gdk.keyval_from_name('0'), 
-                                 gtk.gdk.keyval_from_name('9')):
-      tab_num = event.keyval - gtk.gdk.keyval_from_name('0') or 10
+    if event.state & gdk.ModifierType.MOD1_MASK and \
+          event.keyval in xrange(gdk.keyval_from_name('0'), 
+                                 gdk.keyval_from_name('9')):
+      tab_num = event.keyval - gdk.keyval_from_name('0') or 10
       pages_count = self.plugin_view.get_n_pages()
       if pages_count >= tab_num:
         self.plugin_view.focusTab(tab_num - 1)
@@ -374,7 +380,7 @@ class ViewManager(object):
       action_name = action.get_name()
       ui_manager.uimanager.add_ui(merge_id, ui_manager.PLUGIN_LAYOUT_PATH, 
                                   action_name, action_name, 
-                                  gtk.UI_MANAGER_MENUITEM, True)
+                                  gtk.UIManagerItemType.MENUITEM, True)
 
 
   def _onSingleViewToggled(self, action):
@@ -825,7 +831,7 @@ class MultiViewModel(list, BaseViewModel):
     else:
       tab = view.get_tab_label(plugin)
       x, y, w, h = view.getTabAlloc(tab)
-      rect = gtk.gdk.Rectangle(x, y, w, h)
+      rect = gdk.Rectangle(x, y, w, h)
       menu.popup(None, None, 
                  lambda m, r: (r.x+r.width/2, r.y+r.height/2, True), 
                  0, event.time, rect)
@@ -1063,7 +1069,7 @@ class MultiViewModel(list, BaseViewModel):
           self._NewViewDialog(self.view_manager, transient_window)
       response_id = new_view_dialog.run()
       plugin_name = new_view_dialog.getEntryText()
-      if response_id == gtk.RESPONSE_OK and plugin_name:
+      if response_id == gtk.ResponseType.OK and plugin_name:
         self.view_manager.changeView(context_plugin, plugin_name)
       new_view_dialog.destroy()
 
@@ -1083,9 +1089,9 @@ class MultiViewModel(list, BaseViewModel):
         '''
         self.view_manager = view_manager
         gtk.Dialog.__init__(self, _('New View...'), transient_window)
-        self.add_buttons(gtk.STOCK_OK, gtk.RESPONSE_OK,
-                         gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-        self.set_default_response(gtk.RESPONSE_OK)
+        self.add_buttons(gtk.STOCK_OK, gtk.ResponseType.OK,
+                         gtk.STOCK_CLOSE, gtk.ResponseType.CLOSE)
+        self.set_default_response(gtk.ResponseType.OK)
         completion = gtk.EntryCompletion()
         complete_model = gtk.ListStore(str)
         for view in self.view_manager:
@@ -1114,7 +1120,7 @@ class MultiViewModel(list, BaseViewModel):
         @param entry: Entry box that was activated.
         @type entry: gtk.Entry
         '''
-        self.response(gtk.RESPONSE_OK)
+        self.response(gtk.ResponseType.OK)
 
   class _StoredViewsLayout(object):
     '''

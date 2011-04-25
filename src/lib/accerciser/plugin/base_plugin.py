@@ -11,7 +11,10 @@ available under the terms of the BSD which accompanies this distribution, and
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+
+from gi.repository import Gtk as gtk
 from accerciser.tools import Tools
 import traceback
 import gobject, pango
@@ -207,10 +210,10 @@ class ViewportPlugin(Plugin, gtk.ScrolledWindow):
     Plugin.__init__(self, node, message_manager)
     gtk.ScrolledWindow.__init__(self)
 
-    self.set_policy(gtk.POLICY_AUTOMATIC, 
-                    gtk.POLICY_AUTOMATIC)
+    self.set_policy(gtk.PolicyType.AUTOMATIC, 
+                    gtk.PolicyType.AUTOMATIC)
     self.set_border_width(3)
-    self.set_shadow_type(gtk.SHADOW_NONE)
+    self.set_shadow_type(gtk.ShadowType.NONE)
     self.viewport = gtk.Viewport()
     vbox = gtk.VBox()
     self.viewport.add(vbox)
@@ -222,7 +225,7 @@ class ViewportPlugin(Plugin, gtk.ScrolledWindow):
 
     # Plugin area
     self.plugin_area = gtk.Frame()
-    self.plugin_area.set_shadow_type(gtk.SHADOW_NONE)
+    self.plugin_area.set_shadow_type(gtk.ShadowType.NONE)
     vbox.pack_start(self.plugin_area)
 
   def _onScrollToFocus(self, container, widget):
@@ -259,9 +262,9 @@ class ViewportPlugin(Plugin, gtk.ScrolledWindow):
     @param response_id: response ID
     @type response_id: integer
     '''
-    if response_id == gtk.RESPONSE_APPLY:
+    if response_id == gtk.ResponseType.APPLY:
       pass
-    elif response_id == gtk.RESPONSE_CLOSE:
+    elif response_id == gtk.ResponseType.CLOSE:
       error_message.destroy()
 
 class ConsolePlugin(ViewportPlugin):

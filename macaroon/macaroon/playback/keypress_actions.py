@@ -15,8 +15,15 @@ See "COPYING" in the source distribution for more information.
 Headers in this file shall remain intact.
 '''
 
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+
 import pyatspi
-import gtk
+
 from sequence_step import AtomicAction
 import gobject
 import utils
@@ -30,7 +37,7 @@ min_delta = 50
 # Maximum time before a key release
 release_max = 400
 
-keymap = gtk.gdk.keymap_get_default()
+keymap = gdk.Keymap.get_default()
 
 class KeyPressAction(AtomicAction):
   '''
@@ -53,7 +60,7 @@ class KeyPressAction(AtomicAction):
     if delta_time > release_max: delta_time = release_max
     self._key_name = key_name
     if key_code is None:
-      key_code = utils.getKeyCodeFromVal(gtk.gdk.keyval_from_name(key_name))
+      key_code = utils.getKeyCodeFromVal(gdk.keyval_from_name(key_name))
     AtomicAction.__init__(self, delta_time, self._keyPress, key_code)
 
   def _keyPress(self, key_code):
@@ -95,7 +102,7 @@ class KeyReleaseAction(AtomicAction):
     if delta_time > release_max: delta_time = release_max
     self._key_name = key_name
     if key_code is None:
-      key_code = utils.getKeyCodeFromVal(gtk.gdk.keyval_from_name(key_name))
+      key_code = utils.getKeyCodeFromVal(gdk.keyval_from_name(key_name))
     AtomicAction.__init__(self, delta_time, self._keyRelease, key_code)
 
   def _keyRelease(self, key_code):
@@ -256,7 +263,7 @@ class TypeAction(AtomicAction):
     interval = 0
     for char in string_to_type:
       gobject.timeout_add(interval, self._charType, 
-                          gtk.gdk.unicode_to_keyval(ord(char)))
+                          gdk.unicode_to_keyval(ord(char)))
       interval += self.interval 
     gobject.timeout_add(interval, self.stepDone)
 

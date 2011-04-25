@@ -10,7 +10,11 @@ All rights reserved. This program and the accompanying materials are made
 available under the terms of the BSD which accompanies this distribution, and 
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+
+from gi.repository import Gtk as gtk
+
 import gobject
 import os
 import traceback
@@ -295,14 +299,14 @@ class ValidatorViewport(ViewportPlugin):
     '''
     save_dialog = gtk.FileChooserDialog(
       'Save validator output',
-      action=gtk.FILE_CHOOSER_ACTION_SAVE,
-      buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-               gtk.STOCK_OK, gtk.RESPONSE_OK))
+      action=gtk.FileChooserAction.SAVE,
+      buttons=(gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
+               gtk.STOCK_OK, gtk.ResponseType.OK))
     #save_dialog.connect("response", self._savedDiagResponse)
     save_dialog.set_do_overwrite_confirmation(True)
-    save_dialog.set_default_response(gtk.RESPONSE_OK)
+    save_dialog.set_default_response(gtk.ResponseType.OK)
     response = save_dialog.run()
-    if response == gtk.RESPONSE_OK:
+    if response == gtk.ResponseType.OK:
       self.save_to = open(save_dialog.get_filename(), 'w')
       gobject.idle_add(self._writeFile)
     save_dialog.destroy()

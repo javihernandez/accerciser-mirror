@@ -1,9 +1,15 @@
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+
 import os.path
 from accerciser.plugin import ViewportPlugin
 import pyatspi
-import gtk
-from gtk import keysyms
-import gtksourceview2
+
+import gtsourceview2 as gtksourceview
 import wnck
 from accerciser.i18n import N_, _, DOMAIN
 from Queue import Queue
@@ -32,10 +38,10 @@ class ScriptFactory(object):
   '''
   intepreter_line = '#!/usr/bin/python'
   import_line = ''
-  MODIFIERS = [keysyms.Control_L, keysyms.Control_R, 
-               keysyms.Alt_L, keysyms.Alt_R, 
-               keysyms.Super_L, keysyms.Super_R,
-               keysyms.Shift_L, keysyms.Shift_R]
+  MODIFIERS = [gdk.KEY_Control_L, gdk.KEY_Control_R, 
+               gdk.KEY_Alt_L, gdk.KEY_Alt_R, 
+               gdk.KEY_Super_L, gdk.KEY_Super_R,
+               gdk.KEY_Shift_L, gdk.KEY_Shift_R]
                
   def __init__(self):
     '''
@@ -91,9 +97,9 @@ class DogtailFactory(ScriptFactory):
     if event.id in self.MODIFIERS or \
           event.event_string.startswith('ISO'):
       return
-    if event.modifiers in (0, gtk.gdk.SHIFT_MASK) and \
-          gtk.gdk.keyval_to_unicode(event.id):
-      self.typed_text += unichr(gtk.gdk.keyval_to_unicode(event.id))
+    if event.modifiers in (0, gdk.ModifierType.SHIFT_MASK) and \
+          gdk.keyval_to_unicode(event.id):
+      self.typed_text += unichr(gdk.keyval_to_unicode(event.id))
     else:
       if self.app_name:
         self.commands_queue.put_nowait('focus.application("%s")\n' % \
@@ -144,9 +150,9 @@ class LDTPFactory(DogtailFactory):
     if event.id in self.MODIFIERS or \
           event.event_string.startswith('ISO'):
       return
-    if event.modifiers in (0, gtk.gdk.SHIFT_MASK) and \
-          gtk.gdk.keyval_to_unicode(event.id):
-      self.typed_text += unichr(gtk.gdk.keyval_to_unicode(event.id))
+    if event.modifiers in (0, gdk.ModifierType.SHIFT_MASK) and \
+          gdk.keyval_to_unicode(event.id):
+      self.typed_text += unichr(gdk.keyval_to_unicode(event.id))
     else:
       if self.frame_name:
         self.commands_queue.put_nowait('waittillguiexist("%s")\n' % \
@@ -180,12 +186,12 @@ class ScriptRecorder(ViewportPlugin):
     '''
     Initialize the plugin.
     '''
-    text_buffer = gtksourceview2.Buffer()
-    lm = gtksourceview2.LanguageManager()
+    text_buffer = gtksourceview.Buffer()
+    lm = gtksourceview.LanguageManager()
     lang = lm.get_language('python')
     text_buffer.set_language(lang)
     text_buffer.set_highlight_syntax(True)
-    self.text_view = gtksourceview2.View(text_buffer)
+    self.text_view = gtksourceview.View(text_buffer)
     self.text_view.set_editable(True)
     self.text_view.set_cursor_visible(True)
     xml = gtk.Builder()
@@ -336,13 +342,13 @@ class ScriptRecorder(ViewportPlugin):
     text_buffer = self.text_view.get_buffer()
     if not text_buffer.get_modified():
       return True
-    dialog = gtk.MessageDialog(self.get_toplevel(), 0, gtk.MESSAGE_WARNING,
-                               gtk.BUTTONS_OK_CANCEL,
+    dialog = gtk.MessageDialog(self.get_toplevel(), 0, gtk.MessageType.WARNING,
+                               gtk.ButtonsType.OK_CANCEL,
                                _('The current script will be lost.'))
     dialog.set_title(_('Confirm clear'))
     response_id = dialog.run()
     dialog.destroy()
-    if response_id == gtk.RESPONSE_OK:
+    if response_id == gtk.ResponseType.OK:
       return True
     else:
       return False
@@ -358,14 +364,14 @@ class ScriptRecorder(ViewportPlugin):
     '''
     save_dialog = gtk.FileChooserDialog(
       'Save recorded script',
-      action=gtk.FILE_CHOOSER_ACTION_SAVE,
-      buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-               gtk.STOCK_OK, gtk.RESPONSE_OK))
+      action=gtk.FileChooserAction.SAVE,
+      buttons=(gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
+               gtk.STOCK_OK, gtk.ResponseType.OK))
     save_dialog.set_do_overwrite_confirmation(True)
-    save_dialog.set_default_response(gtk.RESPONSE_OK)
+    save_dialog.set_default_response(gtk.ResponseType.OK)
     save_dialog.show_all()
     response = save_dialog.run()
-    if response == gtk.RESPONSE_OK:
+    if response == gtk.ResponseType.OK:
       save_to = open(save_dialog.get_filename(), 'w')
       text_buffer = self.text_view.get_buffer()
       save_to.write(text_buffer.get_text(text_buffer.get_start_iter(),

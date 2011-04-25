@@ -11,8 +11,13 @@ available under the terms of the BSD which accompanies this distribution, and
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
+import gi
+gi.require_version('Gtk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import GdkPixbuf
+
 import pyatspi
-import gtk
 import os.path
 import pango
 from gobject import markup_escape_text
@@ -307,9 +312,9 @@ class _SectionAccessible(_InterfaceSection):
     self.relations_view = ui_xml.get_object('relations_view')
     self.relations_model = ui_xml.get_object('relations_treestore')
     # preset the different bg colors
-    style = gtk.Style ()
-    self.header_bg = style.bg[gtk.STATE_NORMAL].to_string()
-    self.relation_bg = style.base[gtk.STATE_NORMAL].to_string()
+    style = gtk.Style()
+    self.header_bg = style.bg[gtk.StateType.NORMAL].to_string()
+    self.relation_bg = style.base[gtk.StateType.NORMAL].to_string()
 
     selection = self.relations_view.get_selection()
     selection.set_select_function(self._relationSelectFunc)
@@ -701,28 +706,28 @@ class _SectionHypertext(_InterfaceSection):
     treeview.set_model(self.links_model)
     crt = gtk.CellRendererText()
     tvc = gtk.TreeViewColumn(_('Name'))
-    tvc.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+    tvc.set_sizing(gtk.TreeViewColumnSizing.AUTOSIZE)
     tvc.set_resizable(True)
     tvc.pack_start(crt, True)
     tvc.set_attributes(crt, text=1)
     treeview.append_column(tvc)
     crt = gtk.CellRendererText()
     tvc = gtk.TreeViewColumn(_('URI'))
-    tvc.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+    tvc.set_sizing(gtk.TreeViewColumnSizing.AUTOSIZE)
     tvc.set_resizable(True)
     tvc.pack_start(crt, True)
     tvc.set_attributes(crt, text=3)
     treeview.append_column(tvc)
     crt = gtk.CellRendererText()
     tvc = gtk.TreeViewColumn(_('Start'))
-    tvc.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+    tvc.set_sizing(gtk.TreeViewColumnSizing.AUTOSIZE)
     tvc.set_resizable(True)
     tvc.pack_start(crt, True)
     tvc.set_attributes(crt, text=4)
     treeview.append_column(tvc)
     crt = gtk.CellRendererText()
     tvc = gtk.TreeViewColumn(_('End'))
-    tvc.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+    tvc.set_sizing(gtk.TreeViewColumnSizing.AUTOSIZE)
     tvc.set_resizable(True)
     tvc.pack_start(crt, True)
     tvc.set_attributes(crt, text=5)
@@ -856,7 +861,7 @@ class _SectionSelection(_InterfaceSection):
     '''
     # configure selection tree view
     treeview = ui_xml.get_object('treeview_selection')
-    self.sel_model = gtk.ListStore(gtk.gdk.Pixbuf, str, object)
+    self.sel_model = gtk.ListStore(GdkPixbuf.Pixbuf, str, object)
     treeview.set_model(self.sel_model)
     # connect selection changed signal
     self.sel_selection = treeview.get_selection()
@@ -878,10 +883,10 @@ class _SectionSelection(_InterfaceSection):
     @type acc: Accessibility.Accessible
     '''
     if acc.childCount > 50:
-      theme = gtk.icon_theme_get_default()
+      theme = gtk.IconTheme.get_default()
       self.sel_model.append(
         [theme.load_icon('gtk-dialog-warning', 24, 
-                         gtk.ICON_LOOKUP_USE_BUILTIN),
+                         gtk.IconLookupFlags.USE_BUILTIN),
          _('Too many selectable children'), None])
       # Set section as insensitive, but leave expander label sensitive.
       section_widgets = self.expander.get_children()
@@ -902,9 +907,9 @@ class _SectionSelection(_InterfaceSection):
     self.button_select_all.set_sensitive(multiple_selections)
 
     if multiple_selections:
-      self.sel_selection.set_mode = gtk.SELECTION_MULTIPLE
+      self.sel_selection.set_mode = gtk.SelectionMode.MULTIPLE
     else:
-      self.sel_selection.set_mode = gtk.SELECTION_SINGLE
+      self.sel_selection.set_mode = gtk.SelectionMode.SINGLE
 
   def _onSelectionSelected(self, selection):
     '''
@@ -1388,7 +1393,7 @@ class _SectionText(_InterfaceSection):
       return
 
     x, y = event.get_coords()
-    x, y = self.text_view.window_to_buffer_coords(gtk.TEXT_WINDOW_WIDGET,
+    x, y = self.text_view.window_to_buffer_coords(gtk.TextWindowType.WIDGET,
                                                    int(x), int(y))
     iter = self.text_view.get_iter_at_location(x, y)
      

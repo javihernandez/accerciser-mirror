@@ -12,7 +12,14 @@ available under the terms of the BSD which accompanies this distribution, and
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+gi.require_version('Gdk', '2.0')
+
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk as gdk
+from gi.repository import GdkPixbuf
+
 import gobject
 import pyatspi
 import atk, os
@@ -61,7 +68,7 @@ class AccessibleModel(gtk.TreeStore, Tools):
     Connects required signals.
     '''
     self.acc_cache = [desktop_acc]
-    gtk.TreeStore.__init__(self, gtk.gdk.Pixbuf, str, str, str, bool, bool, object)
+    gtk.TreeStore.__init__(self, GdkPixbuf.Pixbuf, str, str, str, bool, bool, object)
     self.connect('row-changed', self._onRowChanged)
     self.connect('row-filled', self._onRowFilled)
     self.desktop = desktop_acc
@@ -470,9 +477,9 @@ class AccessibleTreeView(gtk.TreeView, Tools):
         return False
       path = self.get_path_at_pos(int(event.x), int(event.y))[0]
       selection = self.get_selection()
-      selection.set_mode(gtk.SELECTION_NONE)
+      selection.set_mode(gtk.SelectionMode.NONE)
       self.set_cursor(path)
-      selection.set_mode(gtk.SELECTION_SINGLE)      
+      selection.set_mode(gtk.SelectionMode.SINGLE)      
       time = event.time
       button = event.button
       func = None
@@ -764,7 +771,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     @type model: L{AccessibleModel}
     '''
     if self.window:
-      self.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+      self.window.set_cursor(gdk.Cursor(gdk.CursorType.WATCH))
 
   def _onEndPop(self, model):
     '''
@@ -774,7 +781,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     @type model: L{AccessibleModel}
     '''
     if self.window:
-      self.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.TOP_LEFT_ARROW))
+      self.window.set_cursor(gdk.Cursor(gdk.CursorType.TOP_LEFT_ARROW))
 
   def _accCellDataFunc(self, tvc, cellrenderer, model, iter):
     '''

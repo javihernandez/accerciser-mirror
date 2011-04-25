@@ -10,7 +10,10 @@ All rights reserved. This program and the accompanying materials are made
 available under the terms of the BSD which accompanies this distribution, and 
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
-import gtk
+import gi
+gi.require_version('Gtk', '2.0')
+
+from gi.repository import Gtk as gtk
 from accerciser.plugin import ViewportPlugin
 from accerciser.i18n import _, N_
 import pyatspi
@@ -61,7 +64,7 @@ class APIBrowser(ViewportPlugin):
     scrolled_window = gtk.ScrolledWindow()
     scrolled_window.add(self.property_tree)
     bottom_hbox.pack_start(scrolled_window)
-    self.iface_combo = gtk.combo_box_new_text() 
+    self.iface_combo = gtk.ComboBoxText() 
     top_hbox.pack_start(self.iface_combo, False)
     self.private_toggle = gtk.CheckButton(_('Hide private attributes'))
     self.private_toggle.set_active(True)
