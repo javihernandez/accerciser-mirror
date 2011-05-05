@@ -10,10 +10,7 @@ All rights reserved. This program and the accompanying materials are made
 available under the terms of the BSD which accompanies this distribution, and 
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
-
 import gi
-gi.require_version('Gtk', '2.0')
-gi.require_version('Gdk', '2.0')
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
@@ -70,7 +67,7 @@ class PluginView(gtk.Notebook):
     gtk.Notebook.__init__(self)
     self.view_name = view_name
     self.set_scrollable(True)
-    self.set_group_id(self.NOTEBOOK_GROUP)
+    #self.set_group_id(self.NOTEBOOK_GROUP)
     self.connect('drag_end', self._onDragEnd)
     self.connect('drag_data_get', self._onDragDataGet)
     self.connect('key-press-event', self._onKeyPress)
@@ -121,7 +118,8 @@ class PluginView(gtk.Notebook):
     '''
     for child in self.getPlugins():
       tab = self.get_tab_label(child)
-      if tab != None and tab.flags() & gtk.WidgetFlags.MAPPED:
+      # TODO-JH: Don't really know if this is correct
+      if tab != None and tab.get_state_flags() & tab.get_mapped():
         x, y, w, h = self.getTabAlloc(tab)
         if event_x >= x and \
               event_x <= x + w and \
@@ -140,10 +138,13 @@ class PluginView(gtk.Notebook):
     @return: X, Y, width any height coordinates.
     @rtype: tuple
     '''
-    gdk_window = widget.window
-    origin_x, origin_y = gdk_window.get_origin()
-    x, y, width, height = widget.get_allocation()
-    if widget.flags() & gtk.WidgetFlags.NO_WINDOW:
+    gdk_window = widget.get_window()
+    origin_x, origin_y, origin_z = gdk_window.get_origin()
+    alloc = widget.get_allocation()
+    x, y, width, height = \
+        alloc.x, alloc.y, alloc.width, alloc.height
+    # TODO-JH: Review this conversion
+    if widget.get_state_flags() & widget.get_has_window():
       origin_x += x
       origin_y += y
     return origin_x, origin_y, width, height
@@ -209,8 +210,8 @@ class PluginView(gtk.Notebook):
       name = tab_label
     elif isinstance(child, Plugin):
       name = getattr(child,'plugin_name_localized', None) or child.plugin_name
-    elif child.name:
-      name = child.name
+    elif child.get_name():
+      name = child.get_name()
     gtk.Notebook.append_page(self, child, None)
     gtk.Notebook.reorder_child(self, child, position)
     gtk.Notebook.set_tab_label(self, child, gtk.Label(name))
@@ -383,7 +384,7 @@ class ViewManager(object):
                                   gtk.UIManagerItemType.MENUITEM, True)
 
 
-  def _onSingleViewToggled(self, action):
+  def _onSingleViewToggled(self, action, data=None):
     '''
     Callback for single view toggle action.
     
@@ -407,8 +408,8 @@ class ViewManager(object):
     self._view_model.close()
     del self._view_model
     for plugin in plugins:
-      if plugin.parent:
-        plugin.parent.remove(plugin)
+      if plugin.get_parent():
+        plugin.get_parent().remove(plugin)
     self._initViewModel(single)
     for plugin in plugins:
       self._view_model.addElement(plugin)
@@ -843,7 +844,7 @@ class MultiViewModel(list, BaseViewModel):
     @param view: Plugin view to connect.
     @type view: :{PluginView}
     '''
-    if isinstance(view.parent, PluginViewWindow):
+    if isinstance(view.get_parent(), PluginViewWindow):
       view.parent.connect('delete_event', Proxy(self._onViewDelete))
     view.connect('plugin_drag_end', Proxy(self._onPluginDragEnd))
     view.connect('tab_popup_menu', Proxy(self._onTabPopupMenu))
@@ -959,7 +960,7 @@ class MultiViewModel(list, BaseViewModel):
     @type new_view_name: string
     '''
     if not plugin or not isinstance(plugin, gtk.Widget): return
-    old_view = plugin.parent
+    old_view = plugin.get_parent()
     new_view = self._getViewOrNewView(new_view_name)
     if old_view is not new_view:
       old_view.remove(plugin)

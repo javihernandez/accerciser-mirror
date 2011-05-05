@@ -13,8 +13,6 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
 import gi
-gi.require_version('Gtk', '2.0')
-gi.require_version('Gdk', '2.0')
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
@@ -500,7 +498,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     menu.popup(None, None, func, button, time, extra_data)
     return True
 
-  def _refreshTopLevel(self, action=None):
+  def _refreshTopLevel(self, action=None, data=None):
     '''
     Refreshes the entire tree at the desktop level.
 
@@ -511,7 +509,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     self.model.popLevel(None)
     # iter over all apps in the desktop too
     
-  def _refreshCurrentLevel(self, action):
+  def _refreshCurrentLevel(self, action, data=None):
     '''
     Refreshes the current level. Selects and expands the parent of the level.
 
@@ -775,8 +773,9 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     @param model: Model that emitted the signal.
     @type model: L{AccessibleModel}
     '''
-    if self.window:
-      self.window.set_cursor(gdk.Cursor(gdk.CursorType.WATCH))
+    if self.get_window():
+      window = self.get_window()
+      window.set_cursor(gdk.Cursor(gdk.CursorType.WATCH))
 
   def _onEndPop(self, model):
     '''
@@ -785,8 +784,9 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     @param model: Model that emitted the signal.
     @type model: L{AccessibleModel}
     '''
-    if self.window:
-      self.window.set_cursor(gdk.Cursor(gdk.CursorType.TOP_LEFT_ARROW))
+    if self.get_window():
+      window = self.get_window()
+      window.set_cursor(gdk.Cursor(gdk.CursorType.TOP_LEFT_ARROW))
 
   def _accCellDataFunc(self, tvc, cellrenderer, model, iter_id, iter_type):
     '''

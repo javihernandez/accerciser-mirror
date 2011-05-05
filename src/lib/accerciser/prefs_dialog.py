@@ -12,9 +12,6 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
 import gi
-gi.require_version('Gtk', '2.0')
-gi.require_version('Gdk', '2.0')
-gi.require_version('Atk', '1.0')
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
@@ -110,8 +107,10 @@ class _HighlighterView(gtk.Alignment):
 
     for label, control in zip(map(lambda x: x.get_accessible(),labels),
                               map(lambda x: x.get_accessible(),controls)):
-      label.add_relationship(atk.RelationType.LABEL_FOR, control)
-      control.add_relationship(atk.RelationType.LABELLED_BY, label)
+      #label.add_relationship(atk.RelationType.LABEL_FOR, control)
+      label.add_relationship(atk.RelationType(3), control)
+      #control.add_relationship(atk.RelationType.LABELLED_BY, label)
+      control.add_relationship(atk.RelationType(4), label)
 
   def _onDurationChanged(self, spin_button):
     '''

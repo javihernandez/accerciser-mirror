@@ -1,5 +1,4 @@
 import gi
-gi.require_version('Wnck', '1.0')
 
 from gi.repository import Wnck as wnck
 

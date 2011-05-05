@@ -12,7 +12,6 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
 import gi
-gi.require_version('Gtk', '2.0')
 
 from gi.repository import Gtk as gtk
 
@@ -96,6 +95,7 @@ class PluginManager(gtk.ListStore, Tools):
     '''
     Load all plugins in global and local plugin paths.
     '''
+    # AQUI PETAA
     for plugin_dir, plugin_fn in self._getPluginFiles():
       self._loadPluginFile(plugin_dir, plugin_fn)
     self.view_manager.initialView()
@@ -158,6 +158,7 @@ class PluginManager(gtk.ListStore, Tools):
     plugin_locals = self._getPluginLocals(plugin_dir, plugin_fn)
     # use keys list to avoid size changes during iteration
     for symbol in plugin_locals.keys():
+      print 'YIIIIIIIIIIIIIIIIJ: ', plugin_fn, symbol
       try:
         is_plugin = \
             issubclass(plugin_locals[symbol], Plugin) and \

@@ -1,6 +1,4 @@
 import gi
-gi.require_version('Gtk', '2.0')
-gi.require_version('Atk', '1.0')
 
 from gi.repository import Gtk as gtk
 from gi.repository import Atk as atk

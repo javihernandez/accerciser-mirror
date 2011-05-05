@@ -14,12 +14,9 @@ available under the terms of the BSD which accompanies this distribution, and
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 import gi
-gi.require_version('Gtk', '2.0')
-#gi.require_version('Wnck', '1.0')
-gi.require_version('Atk', '1.0')
 
 from gi.repository import Gtk as gtk
-#from gi.repository import Wnck as wnck
+from gi.repository import Wnck as wnck
 from gi.repository import Atk as atk
 
 import gobject

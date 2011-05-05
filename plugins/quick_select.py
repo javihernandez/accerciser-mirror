@@ -1,7 +1,4 @@
 import gi
-gi.require_version('Gtk', '2.0')
-gi.require_version('Gdk', '2.0')
-gi.require_version('Wnck', '1.0')
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk

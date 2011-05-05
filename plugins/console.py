@@ -12,7 +12,6 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
 import gi
-gi.require_version('Gtk', '2.0')
 
 from gi.repository import Gtk as gtk
 

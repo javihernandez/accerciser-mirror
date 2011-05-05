@@ -1,6 +1,4 @@
 import gi
-gi.require_version('Gtk', '2.0')
-gi.require_version('Gdk', '2.0')
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
@@ -109,8 +107,8 @@ class AccerciserMainWindow(gtk.Window):
 
     cl = gconf.client_get_default()
     for paned in (self._vpaned, self._hpaned):
-      if not cl.get(GCONF_GENERAL+'/'+paned.name): continue
-      paned_position = cl.get_int(GCONF_GENERAL+'/'+paned.name)
+      if not cl.get(GCONF_GENERAL+'/'+paned.get_name()): continue
+      paned_position = cl.get_int(GCONF_GENERAL+'/'+paned.get_name())
       paned.set_position(paned_position)
       paned.set_data('last_position', paned.get_position())
 
@@ -135,11 +133,11 @@ class AccerciserMainWindow(gtk.Window):
       self._vpaned.set_position(last_pos or 350)
     elif pluginview.get_n_pages() == 0:
       self._vpaned.set_data('last_position', self._vpaned.get_position())
-      self._vpaned.set_position(self._vpaned.allocation.height - 30)
+      self._vpaned.set_position(self._vpaned.get_allocated_height() - 30)
 
   def _onBottomPanelRealize(self, pluginview):
     if pluginview.get_n_pages() == 0:
-      self._vpaned.set_position(self._vpaned.allocation.height - 30)
+      self._vpaned.set_position(self._vpaned.get_allocated_height() - 30)
 
   def _onKeyPress(self, widget, event):
     '''
@@ -169,8 +167,8 @@ class AccerciserMainWindow(gtk.Window):
     Save the dimensions of the main window, and the position of the panes.
     '''
     cl = gconf.client_get_default()
-    cl.set_int(GCONF_GENERAL+'/window_width', self.allocation.width)
-    cl.set_int(GCONF_GENERAL+'/window_height', self.allocation.height)
+    cl.set_int(GCONF_GENERAL+'/window_width', self.get_allocated_width())
+    cl.set_int(GCONF_GENERAL+'/window_height', self.get_allocated_height())
     cl.set_int(GCONF_GENERAL+'/hpaned', self._hpaned.get_position())
     if self.pluginview2.get_n_pages():
       position = self._vpaned.get_position()
