@@ -194,7 +194,12 @@ class AccessibleModel(gtk.TreeStore, Tools):
     @type iter: L{gtk.TreeIter}
     '''
     if iter:
-      row_reference = gtk.TreeRowReference(self, self.get_path(iter))
+      # TODO: pygtk-pygi - Here, we have a problem
+      print dir(iter)
+      #print 'user_data = ', type(iter.user_data)
+
+      #row_reference = gtk.TreeRowReference(self, self.get_path(iter))
+      row_reference = gtk.TreeRowReference()
     else:
       row_reference = None
     self._populating_tasks += 1
@@ -396,8 +401,8 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     tvc = gtk.TreeViewColumn(_('Name'))
     tvc.pack_start(crp, False)
     tvc.pack_start(crt, True)
-    tvc.set_attributes(crp, pixbuf=COL_ICON)
-    tvc.set_attributes(crt, text=COL_NAME)
+    tvc.add_attribute(crp, 'pixbuf', COL_ICON)
+    tvc.add_attribute(crt, 'text', COL_NAME)
     tvc.set_resizable(True)
     tvc.set_cell_data_func(crt, self._accCellDataFunc)
     tvc.set_cell_data_func(crp, self._accCellDataFunc)
@@ -405,14 +410,14 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     crt= gtk.CellRendererText()
     tvc = gtk.TreeViewColumn(_('Role'))
     tvc.pack_start(crt, True)
-    tvc.set_attributes(crt, text=COL_ROLE)
+    tvc.add_attribute(crt, 'text', COL_ROLE)
     tvc.set_resizable(True)
     tvc.set_cell_data_func(crt, self._accCellDataFunc)
     self.append_column(tvc)
     crt = gtk.CellRendererText()
     tvc = gtk.TreeViewColumn(_('Children'))
     tvc.pack_start(crt, True)
-    tvc.set_attributes(crt, text=COL_CHILDCOUNT)
+    tvc.add_attribute(crt, 'text', COL_CHILDCOUNT)
     tvc.set_resizable(True)
     tvc.set_cell_data_func(crt, self._accCellDataFunc)
     self.append_column(tvc)
@@ -427,7 +432,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     selection = self.get_selection()
     selection.unselect_all()
     selection.connect('changed', self._onSelectionChanged)
-    selection.set_select_function(self._selectFunc)
+    selection.set_select_function(self._selectFunc, None)
     self.connect('row-expanded', self._onExpanded)
 
     pyatspi.Registry.registerEventListener(self._accEventChildChanged, 
@@ -478,7 +483,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
       path = self.get_path_at_pos(int(event.x), int(event.y))[0]
       selection = self.get_selection()
       selection.set_mode(gtk.SelectionMode.NONE)
-      self.set_cursor(path)
+      self.set_cursor(path, None, False)
       selection.set_mode(gtk.SelectionMode.SINGLE)      
       time = event.time
       button = event.button
@@ -783,7 +788,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     if self.window:
       self.window.set_cursor(gdk.Cursor(gdk.CursorType.TOP_LEFT_ARROW))
 
-  def _accCellDataFunc(self, tvc, cellrenderer, model, iter):
+  def _accCellDataFunc(self, tvc, cellrenderer, model, iter_id, iter_type):
     '''
     A cellrenderer data function. renderer's this application's node as insensitive.
 
@@ -797,9 +802,9 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     @type iter: L{gtk.TreeIter}
     '''
     # TODO: Remove idle_add when at-spi2 reentrancy issues are fixed
-    gobject.idle_add(self._accCellDataFuncReal, tvc, cellrenderer, model, iter)
+    gobject.idle_add(self._accCellDataFuncReal, tvc, cellrenderer, model, iter_id)
 
-  def _accCellDataFuncReal(self, tvc, cellrenderer, model, iter):
+  def _accCellDataFuncReal(self, tvc, cellrenderer, model, iter_id):
     '''
     Called by _acCellDataFunc when idle
 
@@ -812,8 +817,8 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     @param iter: The iter at the given row.
     @type iter: L{gtk.TreeIter}
     '''
-    if model.iter_is_valid(iter):
-      acc = model.get_value(iter, COL_ACC)
+    if model.iter_is_valid(iter_id):
+      acc = model.get_value(iter_id, COL_ACC)
     else:
       acc = None
     if self.isMyApp(acc):
@@ -821,7 +826,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     else:
       cellrenderer.set_property('sensitive', True)
 
-  def _selectFunc(self, path):
+  def _selectFunc(self, path, foo1, foo2, foo3, foo4):
     '''
     A selection function. Does not allow his application's node to be selected.
 

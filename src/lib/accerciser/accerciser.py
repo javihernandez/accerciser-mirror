@@ -15,13 +15,18 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 import gi
 gi.require_version('Gtk', '2.0')
+#gi.require_version('Wnck', '1.0')
+gi.require_version('Atk', '1.0')
 
 from gi.repository import Gtk as gtk
+#from gi.repository import Wnck as wnck
+from gi.repository import Atk as atk
+
 import gobject
 import os, sys, locale
 from icons import getIcon
 import os
-import atk
+
 import gnome
 from bookmarks import BookmarkStore
 from accessible_treeview import *
@@ -30,7 +35,6 @@ from plugin import PluginManager
 from plugin import PluginView
 from tools import Tools
 from i18n import _, N_
-import wnck
 from gnome import program_get
 import gconf
 from hotkey_manager import HotkeyManager, HotkeyTreeView
@@ -155,7 +159,7 @@ class Main(Tools):
     self.window.saveState()
     self.plugin_manager.close()
 
-  def _onQuit(self, obj):
+  def _onQuit(self, obj, data=None):
     '''
     Quits the app.
 
@@ -165,7 +169,7 @@ class Main(Tools):
     self._shutDown()
     pyatspi.Registry.stop()
     
-  def _onAbout(self, action):
+  def _onAbout(self, action, data=None):
     '''
     Shows the about dialog.
 
@@ -175,7 +179,7 @@ class Main(Tools):
     about = AccerciserAboutDialog()
     about.show_all()
     
-  def _onHelp(self, action):
+  def _onHelp(self, action, data=None):
     '''
     Shows the help dialog.
 
@@ -184,7 +188,7 @@ class Main(Tools):
     '''
     gnome.help_display('accerciser.xml')
          
-  def _onShowPreferences(self, action):
+  def _onShowPreferences(self, action, data=None):
     '''
     Shows the preferences dialog.
 

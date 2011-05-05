@@ -211,7 +211,7 @@ class ValidatorViewport(ViewportPlugin):
     col = gtk.TreeViewColumn(_('Level'))
     rend = gtk.CellRendererText()
     col.pack_start(rend, True)
-    col.set_attributes(rend, text=0)
+    col.add_attribute(rend, 'text', 0)
     self.report.append_column(col)
     # description column
     rend = gtk.CellRendererText()

@@ -14,14 +14,15 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 
 import gi
 gi.require_version('Gtk', '2.0')
+gi.require_version('Wnck', '1.0')
 
 from gi.repository import Gtk as gtk
 from gi.repository import GdkPixbuf
+from gi.repository import Wnck as wnck
 
 import sys, os, glob
 
 import gobject
-import wnck
 from pyatspi.constants import *
 
 ICONS_PATH = os.path.join(sys.prefix, 'share', 
@@ -47,7 +48,7 @@ def getIcon(acc):
       except gobject.GError:
         pass
       # then try wnck
-      s = wnck.screen_get_default()
+      s = wnck.Screen.get_default()
       s.force_update()
       for win in s.get_windows():
         wname = win.get_name()

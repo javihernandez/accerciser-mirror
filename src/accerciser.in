@@ -46,7 +46,7 @@ except Exception:
   pass
 else:
   # TODO: REVIEW
-  gtk.Window.set_default_icon_list(*icons)
+  gtk.Window.set_default_icon_list(icons)
   
 import accerciser
 accerciser.main()

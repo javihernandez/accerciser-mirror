@@ -20,9 +20,6 @@ from gi.repository import Gtk as gtk
 from gnome import program_get, url_show
 from i18n import _
 
-gtk.AboutDialog.set_url_hook(lambda dialog, url, data: url_show(url), None)
-
-
 class AccerciserAboutDialog(gtk.AboutDialog):
   '''
   Creates a dialog with info about the program.
@@ -66,6 +63,7 @@ class AccerciserAboutDialog(gtk.AboutDialog):
     program = program_get()
     gtk.AboutDialog.__init__(self)
     self.connect('response', self._onResponse)
+    self.connect('activate-link', lambda dialog, url, data: url_show(url), None)
     gtk.AboutDialog.set_authors(self, self.AUTHORS)
     gtk.AboutDialog.set_artists(self, self.ARTISTS)
     gtk.AboutDialog.set_documenters(self, self.DOCUMENTERS)

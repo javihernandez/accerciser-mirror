@@ -80,7 +80,7 @@ class MessageManager(gobject.GObject):
     message = PluginErrorMessage(error_message, details)
     message.connect('response', self._onPluginResponseRefresh, plugin_class)
     if getattr(plugin_instance, 'parent', None):
-      plugin_instance.message_area.pack_start(message)
+      plugin_instance.message_area.pack_start(message, True, True, 0)
       message.show_all()
     else:
       self.message_tab.addMessage(message)
@@ -164,7 +164,7 @@ class MessageManager(gobject.GObject):
       @param message: The message to be added.
       @type message: L{PluginMessage}
       '''
-      self._vbox.pack_start(message, False)
+      self._vbox.pack_start(message, False, True, 0)
       self.show()
       self._vbox.show_all()
       
@@ -220,14 +220,15 @@ class PluginMessage(gtk.Frame):
     w = gtk.Window()
     w.set_name('gtk-tooltip')
     w.ensure_style()
-    self.message_style = w.rc_get_style()
+    #self.message_style = w.rc_get_style()
+    self.message_style = gtk.rc_get_style(w)
 
     event_box = gtk.EventBox()
     event_box.set_style(self.message_style)
     self.add(event_box)
     hbox = gtk.HBox()
     event_box.add(hbox)
-    hbox.pack_start(self.vbox, padding=3)
+    hbox.pack_start(self.vbox, True, True, 3)
     hbox.pack_start(self.action_area, False, False, 3)
 
   def add_button(self, button_text, response_id):
@@ -246,7 +247,7 @@ class PluginMessage(gtk.Frame):
     button.set_use_stock(True)
     button.set_label(button_text)
     button.connect('clicked', self._onActionActivated, response_id)
-    self.action_area.pack_start(button, False, False)
+    self.action_area.pack_start(button, False, False, 0)
     return button
 
   def _onActionActivated(self, button, response_id):
@@ -276,16 +277,16 @@ class PluginErrorMessage(PluginMessage):
     PluginMessage.__init__(self)
     hbox = gtk.HBox()
     hbox.set_spacing(6)
-    self.vbox.pack_start(hbox, False, False)
+    self.vbox.pack_start(hbox, False, False, 0)
     image = gtk.Image()
     image.set_from_stock(gtk.STOCK_DIALOG_WARNING,
                          gtk.IconSize.SMALL_TOOLBAR)
-    hbox.pack_start(image, False, False)
+    hbox.pack_start(image, False, False, 0)
     label = gtk.Label()
     label.set_ellipsize(pango.ELLIPSIZE_END)
     label.set_selectable(True)
     label.set_markup('<b>%s</b>' % error_message)
-    hbox.pack_start(label)
+    hbox.pack_start(label, True, True, 0)
     label = gtk.Label(details)
     label.set_ellipsize(pango.ELLIPSIZE_END)
     label.set_selectable(True)

@@ -211,7 +211,7 @@ class PluginView(gtk.Notebook):
       name = getattr(child,'plugin_name_localized', None) or child.plugin_name
     elif child.name:
       name = child.name
-    gtk.Notebook.append_page(self, child)
+    gtk.Notebook.append_page(self, child, None)
     gtk.Notebook.reorder_child(self, child, position)
     gtk.Notebook.set_tab_label(self, child, gtk.Label(name))
 
@@ -1024,7 +1024,10 @@ class MultiViewModel(list, BaseViewModel):
       '''
       menu_item = None
       for view in self.view_manager:
-        menu_item = gtk.RadioMenuItem(menu_item, view.view_name)
+        # TODO: pygtk-pygi - Check differerences 
+        #menu_item = gtk.RadioMenuItem(menu_item, view.view_name)
+        menu_item = gtk.RadioMenuItem()
+        menu_item.set_name(view.view_name)
         menu_item.connect('toggled', self._onItemToggled, view, context_plugin)
         menu_item.set_active(view == context_plugin.parent)
         self.append(menu_item)
@@ -1032,8 +1035,9 @@ class MultiViewModel(list, BaseViewModel):
       menu_item = gtk.SeparatorMenuItem()
       self.append(menu_item)
       menu_item.show()
-      menu_item = gtk.MenuItem(_('<i>_New view...</i>'))
-      menu_item.child.set_use_markup(True)
+      menu_item = gtk.MenuItem(name=_('<i>_New view...</i>'))
+      # TODO: pygtk-pygi - Check differerences 
+      #menu_item.child.set_use_markup(True)
       menu_item.connect('activate', self._onItemActivated, 
                         context_plugin, transient_window)
       self.append(menu_item)

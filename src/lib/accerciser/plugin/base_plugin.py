@@ -221,12 +221,12 @@ class ViewportPlugin(Plugin, gtk.ScrolledWindow):
     self.add(self.viewport)
     # Message area
     self.message_area = gtk.VBox()
-    vbox.pack_start(self.message_area, False, False)
+    vbox.pack_start(self.message_area, False, False, 0)
 
     # Plugin area
     self.plugin_area = gtk.Frame()
     self.plugin_area.set_shadow_type(gtk.ShadowType.NONE)
-    vbox.pack_start(self.plugin_area)
+    vbox.pack_start(self.plugin_area, True, True, 0)
 
   def _onScrollToFocus(self, container, widget):
     '''

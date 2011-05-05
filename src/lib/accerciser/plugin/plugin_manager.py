@@ -166,14 +166,15 @@ class PluginManager(gtk.ListStore, Tools):
         continue
       if is_plugin:
         self.handler_block(self._row_changed_handler)
-        iter = self.append([None, plugin_locals[symbol], plugin_dir])
+
+        iter_id = self.append([None, plugin_locals[symbol], plugin_dir])
         self.handler_unblock(self._row_changed_handler)
         # if a plugin class is found, initialize
         enabled = plugin_locals[symbol].plugin_name not in \
             GConfListWrapper(GCONF_PLUGIN_DISABLED)
         if enabled:
-          self._enablePlugin(iter)
-        self.row_changed(self.get_path(iter), iter)
+          self._enablePlugin(iter_id)
+        self.row_changed(self.get_path(iter_id), iter_id)
 
   def _enablePlugin(self, iter):
     '''
@@ -435,9 +436,11 @@ class PluginManager(gtk.ListStore, Tools):
       plugin = \
           self.plugin_manager[path][self.plugin_manager.COL_INSTANCE]
       menu = self.view_manager.Menu(plugin, self.get_toplevel())
+      print menu
+      print type(menu)
       menu.popup(None, None, pos_func, button, time, data)
 
-    def _viewNameDataFunc(self, column, cell, model, iter):
+    def _viewNameDataFunc(self, column, cell, model, iter, foo=None):
       '''
       Function for determining the displayed data in the tree's view column.
       
@@ -460,7 +463,7 @@ class PluginManager(gtk.ListStore, Tools):
         cell.set_property('sensitive', False)
       cell.set_property('text', _(view_name))
 
-    def _pluginNameDataFunc(self, column, cell, model, iter):
+    def _pluginNameDataFunc(self, column, cell, model, iter, foo=None):
       '''
       Function for determining the displayed data in the tree's plugin column.
       
@@ -477,7 +480,7 @@ class PluginManager(gtk.ListStore, Tools):
       cell.set_property('text', plugin_class.plugin_name_localized or \
                           plugin_class.plugin_name)
 
-    def _pluginStateDataFunc(self, column, cell, model, iter):
+    def _pluginStateDataFunc(self, column, cell, model, iter, foo=None):
       '''
       Function for determining the displayed state of the plugin's checkbox.
       

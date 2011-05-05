@@ -14,12 +14,13 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 import gi
 gi.require_version('Gtk', '2.0')
 gi.require_version('Gdk', '2.0')
+gi.require_version('Atk', '1.0')
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
+from gi.repository import Atk as atk
 
 from i18n import _
-import atk
 import gconf
 import node
 from tools import parseColorString
@@ -42,7 +43,8 @@ class AccerciserPreferencesDialog(gtk.Dialog):
     self.connect('response', self._onResponse)
     self.set_default_size(500,250)
     notebook = gtk.Notebook()
-    self.vbox.add(notebook)
+    vbox = self.get_children()[0]
+    vbox.add(notebook)
     for view, section in [(plugins_view, _('Plugins')),
                           (hotkeys_view, _('Global Hotkeys'))]:
       if view is not None:
@@ -108,8 +110,8 @@ class _HighlighterView(gtk.Alignment):
 
     for label, control in zip(map(lambda x: x.get_accessible(),labels),
                               map(lambda x: x.get_accessible(),controls)):
-      label.add_relationship(atk.RELATION_LABEL_FOR, control)
-      control.add_relationship(atk.RELATION_LABELLED_BY, label)
+      label.add_relationship(atk.RelationType.LABEL_FOR, control)
+      control.add_relationship(atk.RelationType.LABELLED_BY, label)
 
   def _onDurationChanged(self, spin_button):
     '''

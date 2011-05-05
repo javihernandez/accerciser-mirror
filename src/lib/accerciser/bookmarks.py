@@ -1,9 +1,10 @@
 import gi
 gi.require_version('Gtk', '2.0')
+gi.require_version('Atk', '1.0')
 
 from gi.repository import Gtk as gtk
+from gi.repository import Atk as atk
 
-import atk
 import os
 from xml.dom.minidom import getDOMImplementation, parse, Element
 from i18n import _
@@ -84,7 +85,7 @@ class BookmarkStore(gtk.ListStore):
                                 'sep', None, 
                                 gtk.UIManagerItemType.SEPARATOR, False)
 
-  def _onAddBookmark(self, action):
+  def _onAddBookmark(self, action, data=None):
     '''
     Callback for AddBookmark action.
     
@@ -102,7 +103,7 @@ class BookmarkStore(gtk.ListStore):
       self.remove(iter)
     dialog.destroy()
 
-  def _onEditBookmarks(self, action):
+  def _onEditBookmarks(self, action, data=None):
     '''
     Callback for EditBookmark action.
     
@@ -330,6 +331,7 @@ class BookmarkStore(gtk.ListStore):
                           buttons=(gtk.STOCK_CLOSE, gtk.ResponseType.CLOSE))
       self.set_default_size(480,240)
       self.connect('response', self._onResponse)
+      vbox = self.get_children()[0]
       hbox = gtk.HBox()
       hbox.set_spacing(3)
       tv = self._createTreeView(bookmarks_store)
@@ -337,9 +339,9 @@ class BookmarkStore(gtk.ListStore):
       sw.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
       sw.set_shadow_type(gtk.ShadowType.IN)
       sw.add(tv)
-      hbox.pack_start(sw)
+      hbox.pack_start(sw, True, True, 0)
       button_vbox = gtk.VBox()
-      hbox.pack_start(button_vbox, False, False)
+      hbox.pack_start(button_vbox, False, False, 0)
       add_button = gtk.Button('gtk-add')
       add_button.set_use_stock(True)
       add_button.connect('clicked', self._onAddClicked, tv)
@@ -349,10 +351,10 @@ class BookmarkStore(gtk.ListStore):
       jump_button = gtk.Button('gtk-jump-to')
       jump_button.set_use_stock(True)
       jump_button.connect('clicked', self._onJumpToClicked, tv)
-      button_vbox.pack_start(add_button, False, False)
-      button_vbox.pack_start(remove_button, False, False)
-      button_vbox.pack_start(jump_button, False, False)
-      self.vbox.add(hbox)
+      button_vbox.pack_start(add_button, False, False, 0)
+      button_vbox.pack_start(remove_button, False, False, 0)
+      button_vbox.pack_start(jump_button, False, False, 0)
+      vbox.add(hbox)
       hbox.set_border_width(3)
       self.show_all()
 
@@ -523,7 +525,8 @@ class BookmarkStore(gtk.ListStore):
       table = gtk.Table(3, 2, False)
       table.set_row_spacings(3)
       table.set_col_spacings(3)
-      self.vbox.add(table)
+      vbox = self.get_children()[0]
+      vbox.add(table)
       self._title_entry = gtk.Entry()
       self._title_entry.connect('changed', self._onChanged, ok_button)
       self._app_entry = gtk.Entry()
@@ -544,8 +547,8 @@ class BookmarkStore(gtk.ListStore):
         label_widget.set_alignment(0.0,0.5)
         label_acc = label_widget.get_accessible()
         entry_acc = entry.get_accessible()
-        label_acc.add_relationship(atk.RELATION_LABEL_FOR, entry_acc)
-        entry_acc.add_relationship(atk.RELATION_LABELLED_BY, label_acc)
+        label_acc.add_relationship(atk.RelationType.LABEL_FOR, entry_acc)
+        entry_acc.add_relationship(atk.RelationType.LABELLED_BY, label_acc)
         table.attach(gtk.Label(label), 0, 1, i, i+1, gtk.AttachOptions.FILL, 0)
         table.attach(entry, 1, 2, i, i+1)
       self.show_all()

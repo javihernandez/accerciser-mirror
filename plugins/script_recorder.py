@@ -1,16 +1,18 @@
 import gi
 gi.require_version('Gtk', '2.0')
 gi.require_version('Gdk', '2.0')
+#gi.require_version('Wnck', '1.0')
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
+#from gi.repository import Wnck as wnck
 
 import os.path
 from accerciser.plugin import ViewportPlugin
 import pyatspi
 
-import gtsourceview2 as gtksourceview
-import wnck
+import gtksourceview2 as gtksourceview
+
 from accerciser.i18n import N_, _, DOMAIN
 from Queue import Queue
 
