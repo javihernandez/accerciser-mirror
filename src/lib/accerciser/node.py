@@ -204,7 +204,8 @@ class _HighLight(gtk.Window):
                stroke_width, padding=0):
 
     # Initialize window.
-    gtk.Window.__init__(self, gtk.WindowType.POPUP)
+    #gtk.Window.__init__(self, gtk.WindowType.POPUP)
+    gtk.Window.__init__(self)
 
     # Normalize position for stroke and padding.
     self.x, self.y = x - padding, y - padding
@@ -215,8 +216,8 @@ class _HighLight(gtk.Window):
     if self._composited:
       # Prepare window for transparency.
       screen = self.get_screen()
-      colormap = screen.get_rgba_colormap()
-      self.set_colormap(colormap)
+      visual = screen.get_rgba_visual()
+      self.set_visual(visual)
     else:
       # Take a screenshot for compositing on the client side.
       self.root = gdk.get_default_root_window().get_image(
@@ -242,8 +243,8 @@ class _HighLight(gtk.Window):
       fill_opacity=fill_alpha,
       stroke_opacity=stroke_alpha)
 
-    # Connect "expose" event.
-    self.connect("expose-event", self._onExpose)
+    # Connect "draw"
+    self.connect("draw", self._onExpose)
     
   def highlight(self, duration=500):
     if duration > 0:
@@ -272,7 +273,8 @@ class _HighLight(gtk.Window):
       cairo_operator = cairo.OPERATOR_OVER
     else:
       cairo_operator = cairo.OPERATOR_SOURCE
-    cr = self.window.cairo_create()
+    window = self.get_window()
+    cr = window.cairo_create()
     cr.set_source_rgba(1.0, 1.0, 1.0, 0.0)
     cr.set_operator(cairo_operator)
     cr.paint()

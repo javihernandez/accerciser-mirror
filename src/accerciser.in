@@ -27,11 +27,11 @@ libs = os.path.join(sys.prefix, 'lib',
 # point to the proper site-packages path
 sys.path.insert(1, libs)
 
-import gnome
-# make this program accessible
-props = { gnome.PARAM_APP_DATADIR : os.path.join(sys.prefix, 'share')}
-gnome.program_init('accerciser', '@VERSION@', 
-                   properties=props, argv=['accerciser'] + sys.argv[1:])
+#import gnome
+## make this program accessible
+#props = { gnome.PARAM_APP_DATADIR : os.path.join(sys.prefix, 'share')}
+#gnome.program_init('accerciser', '@VERSION@', 
+#                   properties=props, argv=['accerciser'] + sys.argv[1:])
 
 from gi.repository import Gtk as gtk
 # initialize threads
@@ -47,5 +47,6 @@ else:
   # TODO: REVIEW
   gtk.Window.set_default_icon_list(icons)
   
+print "WARNING: You're runnning a pygi gtk3 unstable code\n"
 import accerciser
 accerciser.main()

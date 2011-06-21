@@ -17,8 +17,8 @@ import gi
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
 from gi.repository import GdkPixbuf
+from gi.repository import GObject
 
-import gobject
 import pyatspi
 import atk, os
 import ui_manager
@@ -48,16 +48,16 @@ class AccessibleModel(gtk.TreeStore, Tools):
   @type acc_cache: list
   '''
   __gsignals__ = {'row-filled' : 
-                  (gobject.SIGNAL_RUN_FIRST,
-                   gobject.TYPE_NONE, 
-                   (gobject.TYPE_PYOBJECT,)),
+                  (GObject.SignalFlags.RUN_FIRST,
+                   None, 
+                   (GObject.TYPE_PYOBJECT,)),
                   'start-populating' :
-                    (gobject.SIGNAL_RUN_FIRST,
-                     gobject.TYPE_NONE, 
+                    (GObject.SignalFlags.RUN_FIRST,
+                     None,
                      ()),
                   'end-populating' :
-                    (gobject.SIGNAL_RUN_FIRST,
-                     gobject.TYPE_NONE, 
+                    (GObject.SignalFlags.RUN_FIRST,
+                     None, 
                      ())}
 
   def __init__(self, desktop_acc):
@@ -192,18 +192,17 @@ class AccessibleModel(gtk.TreeStore, Tools):
     @type iter: L{gtk.TreeIter}
     '''
     if iter:
-      # TODO: pygtk-pygi - Here, we have a problem
-      print dir(iter)
-      #print 'user_data = ', type(iter.user_data)
+      tree_path = self.get_path(iter)
+      path = tuple(tree_path.get_indices())
 
-      #row_reference = gtk.TreeRowReference(self, self.get_path(iter))
-      row_reference = gtk.TreeRowReference()
+      row_reference = gtk.TreeRowReference.new(self, tree_path)
+      #row_reference = gtk.TreeRowReference()
     else:
       row_reference = None
     self._populating_tasks += 1
     if self._populating_tasks == 1:
       self.emit('start-populating')
-    gobject.idle_add(self._popOnIdle, row_reference)
+    GObject.idle_add(self._popOnIdle, row_reference)
 
   def _popOnIdle(self, row_reference):
     '''
@@ -225,7 +224,9 @@ class AccessibleModel(gtk.TreeStore, Tools):
         return False
       iter = self.get_iter(row_reference.get_path())
       parent = self[iter][COL_ACC]
-      if self[(row_reference.get_path())+(0,)][COL_DUMMY]:
+      tree_path = row_reference.get_path()
+      path = tuple(tree_path.get_indices())
+      if self[path+(0,)][COL_DUMMY]:
         remove_iter = self.iter_children(iter)
 
     already_populated_num = self.iter_n_children(iter)
@@ -486,7 +487,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
       time = event.time
       button = event.button
       func = None
-      extra_data = None
+      extra_data = int()
     else:
       path, col= self.get_cursor()
       time = gtk.get_current_event_time()
@@ -612,7 +613,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
       # We do this because an application won't have an icon loaded in 
       # the window manager when it is first registered to at-spi
       if new_child == new_child.getApplication():
-        gobject.timeout_add(1000, self._refreshIcon, new_child)
+        GObject.timeout_add(1000, self._refreshIcon, new_child)
     
   def _refreshIcon(self, app):
     '''
@@ -696,7 +697,9 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     self.node.update(new_acc)
     self.node.handler_unblock(self._changed_handler)
     if iter:
-      path = model.get_path(iter)
+      tree_path = model.get_path(iter)
+      path = tuple(tree_path.get_indices())
+
       self.node.tree_path = list(path[1:])
 
   def _onAccChanged(self, node, acc):
@@ -802,7 +805,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     @type iter: L{gtk.TreeIter}
     '''
     # TODO: Remove idle_add when at-spi2 reentrancy issues are fixed
-    gobject.idle_add(self._accCellDataFuncReal, tvc, cellrenderer, model, iter_id)
+    GObject.idle_add(self._accCellDataFuncReal, tvc, cellrenderer, model, iter_id)
 
   def _accCellDataFuncReal(self, tvc, cellrenderer, model, iter_id):
     '''
@@ -826,7 +829,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     else:
       cellrenderer.set_property('sensitive', True)
 
-  def _selectFunc(self, path, foo1, foo2, foo3, foo4):
+  def _selectFunc(self, tree_selection, acc_model, tree_path, foo3, foo4):
     '''
     A selection function. Does not allow his application's node to be selected.
 
@@ -836,6 +839,8 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     @return: True if the row's accessible is not this app.
     @rtype: boolean
     '''
+    path = tuple(tree_path.get_indices())
+
     acc = self.model[path][COL_ACC]
     return not self.isMyApp(acc)
 

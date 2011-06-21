@@ -198,7 +198,10 @@ class AccerciserMainWindow(gtk.Window):
     context_id = self.statusbar.get_context_id('lineage')
     if not iter:
       return
-    path = map(str, model.get_path(iter))
+    tree_path = model.get_path(iter)
+    path_tuple = tuple(tree_path.get_indices())
+
+    path = map(str, path_tuple)
     self.statusbar.pop(context_id)
     if len(path) > 1:
       self.statusbar.push(context_id, 'Path: '+' '.join(path[1:]))

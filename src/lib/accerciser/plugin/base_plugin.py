@@ -16,7 +16,7 @@ import gi
 from gi.repository import Gtk as gtk
 from accerciser.tools import Tools
 import traceback
-import gobject, pango
+import pango
 
 class Plugin(Tools):
   '''
