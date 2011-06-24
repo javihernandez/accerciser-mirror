@@ -18,13 +18,15 @@ import gi
 from gi.repository import Gtk as gtk
 from gi.repository import Wnck as wnck
 from gi.repository import Atk as atk
+# TODO: If remove this print, a few lines below atk.RelationType doesn't have
+# setted its properties properly. Need to investigate this issue
+print dir(atk.RelationType)
 
 import gobject
 import os, sys, locale
 from icons import getIcon
 import os
 
-import gnome
 from bookmarks import BookmarkStore
 from accessible_treeview import *
 from node import Node
@@ -32,7 +34,6 @@ from plugin import PluginManager
 from plugin import PluginView
 from tools import Tools
 from i18n import _, N_
-from gnome import program_get
 import gconf
 from hotkey_manager import HotkeyManager, HotkeyTreeView
 import gconf
@@ -183,7 +184,8 @@ class Main(Tools):
     @param widget: The widget that emitted the signal that this callback caught.
     @type widget: L{gtk.Widget}
     '''
-    gnome.help_display('accerciser.xml')
+    # TODO: This must to be filled with new mallarized doc
+    #gnome.help_display('accerciser.xml')
          
   def _onShowPreferences(self, action, data=None):
     '''

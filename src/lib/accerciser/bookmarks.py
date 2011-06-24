@@ -1,5 +1,3 @@
-import gi
-
 from gi.repository import Gtk as gtk
 from gi.repository import Atk as atk
 
@@ -9,7 +7,6 @@ from i18n import _
 from pyatspi import getPath
 from random import random
 import random
-import gobject
 import ui_manager
 
 COL_NAME = 0
@@ -193,7 +190,7 @@ class BookmarkStore(gtk.ListStore):
     return filter(lambda x: isinstance(x, Element),
                   self._xmldoc.documentElement.childNodes)
 
-  def _onRowChanged(self, model, path, iter):
+  def _onRowChanged(self, model, tree_path, iter):
     '''
     Callback for row changes. Persist changes to disk.
     
@@ -204,6 +201,7 @@ class BookmarkStore(gtk.ListStore):
     @param iter: Iter of row that changed.
     @type iter: gtk.TreeIter
     '''
+    path = tuple(tree_path.get_indices())
     node = self._getElements()[path[0]]
     bookmark = model[iter][0]
     if bookmark is None: return
@@ -212,7 +210,7 @@ class BookmarkStore(gtk.ListStore):
       node.setAttribute(attr, getattr(bookmark, attr))
     self._persist()
 
-  def _onRowDeleted(self, model, path):
+  def _onRowDeleted(self, model, tree_path):
     '''
     Callback for row deletions. Persist changes to disk, and update UI.
     
@@ -221,6 +219,7 @@ class BookmarkStore(gtk.ListStore):
     @param path: Path of row that got deleted.
     @type path: tuple
     '''
+    path = tuple(tree_path.get_indices())
     node = self._getElements()[path[0]]
     self._xmldoc.documentElement.removeChild(node)
     self._persist()

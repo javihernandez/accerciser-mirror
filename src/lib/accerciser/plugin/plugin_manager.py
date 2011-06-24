@@ -158,7 +158,6 @@ class PluginManager(gtk.ListStore, Tools):
     plugin_locals = self._getPluginLocals(plugin_dir, plugin_fn)
     # use keys list to avoid size changes during iteration
     for symbol in plugin_locals.keys():
-      print 'YIIIIIIIIIIIIIIIIJ: ', plugin_fn, symbol
       try:
         is_plugin = \
             issubclass(plugin_locals[symbol], Plugin) and \
@@ -437,8 +436,6 @@ class PluginManager(gtk.ListStore, Tools):
       plugin = \
           self.plugin_manager[path][self.plugin_manager.COL_INSTANCE]
       menu = self.view_manager.Menu(plugin, self.get_toplevel())
-      print menu
-      print type(menu)
       menu.popup(None, None, pos_func, button, time, data)
 
     def _viewNameDataFunc(self, column, cell, model, iter, foo=None):

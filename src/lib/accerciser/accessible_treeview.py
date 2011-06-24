@@ -300,7 +300,8 @@ class AccessibleModel(gtk.TreeStore, Tools):
     @type iter: gtk.TreeIter
     '''
     if iter and self._path_to_populate:
-      path = self.get_path(iter)
+      tree_path = self.get_path(iter)
+      path = tuple(tree_path.get_indices())
       if self._path_to_populate[:len(path)] == path:
         if self._walkThroughFilled(self._path_to_populate):
           self._path_to_populate = None
@@ -319,7 +320,7 @@ class AccessibleModel(gtk.TreeStore, Tools):
     '''
     path = ()
     child = acc
-    while child.parent:
+    while child.get_parent():
       try:
         index_in_parent = child.getIndexInParent()
         if index_in_parent < 0:
@@ -327,7 +328,7 @@ class AccessibleModel(gtk.TreeStore, Tools):
         path = (index_in_parent,) + path
       except Exception, e:
         return None
-      child = child.parent
+      child = child.get_parent()
     try:
       path = (list(self.desktop).index(child),) + path
     except Exception, e:
@@ -642,7 +643,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     if parent_iter:
       iter = self.model.iter_children(parent_iter)
     else:
-      iter = self.model.get_iter_root()
+      iter = self.model.get_iter_first()
     while iter:
       if self.model[iter][COL_ACC] not in parent:
         if not self.model.remove(iter):
@@ -751,7 +752,7 @@ class AccessibleTreeView(gtk.TreeView, Tools):
     @type iter: gtk.TreeIter
     '''
     if iter and self._path_to_expand and \
-          self._path_to_expand[:-1] == model.get_path(iter):
+          self._path_to_expand[:-1] == model.get_path(iter).get_indices():
       self._selectExistingPath(self._path_to_expand)
       self._path_to_expand = None
 

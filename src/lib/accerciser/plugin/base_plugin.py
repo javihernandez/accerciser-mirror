@@ -239,12 +239,12 @@ class ViewportPlugin(Plugin, gtk.ScrolledWindow):
     if widget is None: return
     child = widget
     while isinstance(child, gtk.Container) and \
-          child.focus_child is not None:
-      child = child.focus_child
+          child.get_focus_child() is not None:
+      child = child.get_focus_child()
 
     x, y = child.translate_coordinates(self.viewport, 0, 0)
-    w, h = child.allocation.width, child.allocation.height
-    vw, vh = self.viewport.allocation.width, self.viewport.allocation.height
+    w, h = child.get_allocation().width, child.get_allocation().height
+    vw, vh = self.viewport.get_allocation().width, self.viewport.get_allocation().height
 
     adj = self.viewport.get_vadjustment()
     if y+h > vh:
