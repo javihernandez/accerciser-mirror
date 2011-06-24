@@ -179,7 +179,7 @@ class EventMonitor(ViewportPlugin):
     '''
     pyatspi.Registry.deregisterEventListener(self._handleAccEvent, 
                                              *self.listen_list)
-    self.listen_list = self._getEnabledEvents(self.events_model.get_iter_root())
+    self.listen_list = self._getEnabledEvents(self.events_model.get_iter_first())
     if self.monitor_toggle.get_active():
       pyatspi.Registry.registerEventListener(self._handleAccEvent, 
                                              *self.listen_list)
@@ -273,7 +273,7 @@ class EventMonitor(ViewportPlugin):
     @param button: Button that was clicked
     @type button: gtk.Button
     '''
-    iter = self.events_model.get_iter_root()
+    iter = self.events_model.get_iter_first()
     while iter:
       self._iterToggle(iter, True)
       iter = self.events_model.iter_next(iter)
@@ -286,7 +286,7 @@ class EventMonitor(ViewportPlugin):
     @param button: Button that was clicked.
     @type button: gtk.Button
     '''
-    iter = self.events_model.get_iter_root()
+    iter = self.events_model.get_iter_first()
     while iter:
       self._iterToggle(iter, False)
       iter = self.events_model.iter_next(iter)
@@ -422,8 +422,9 @@ class EventMonitor(ViewportPlugin):
       if tag.get_data('islink'):
         cursor = gdk.Cursor(gdk.CursorType.HAND2)
         break
-    textview.get_window(gtk.TextWindowType.TEXT).set_cursor(cursor)
-    textview.window.get_pointer()
+    window = textview.get_window(gtk.TextWindowType.TEXT)
+    window.set_cursor(cursor)
+    window.get_pointer()
     return False
 
   def _handleAccEvent(self, event):
