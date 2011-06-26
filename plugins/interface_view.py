@@ -15,11 +15,11 @@ import gi
 
 from gi.repository import Gtk as gtk
 from gi.repository import GdkPixbuf
+from gi.repository.GLib import markup_escape_text
 
 import pyatspi
 import os.path
 import pango
-from gobject import markup_escape_text
 from accerciser.plugin import ViewportPlugin
 from accerciser.icons import getIcon
 from accerciser.i18n import _, N_, DOMAIN
@@ -114,7 +114,7 @@ class InterfaceViewer(ViewportPlugin):
       role_name = '%s: %s' % (role, name)
     else:
       role_name = role
-    self.label_role.set_markup('<b>%s</b>' % markup_escape_text(role_name))
+    self.label_role.set_markup('<b>%s</b>' % markup_escape_text(role_name, len(role_name)))
       
   def onAccChanged(self, acc):
     '''
@@ -129,7 +129,7 @@ class InterfaceViewer(ViewportPlugin):
       role_name = '%s: %s' % (role, name)
     else:
       role_name = role
-    self.label_role.set_markup('<b>%s</b>' % markup_escape_text(role_name))
+    self.label_role.set_markup('<b>%s</b>' % markup_escape_text(role_name, len(role_name)))
     interfaces = pyatspi.listInterfaces(acc)
     for section_obj in self.sections:
       section_obj.disable()
@@ -356,13 +356,13 @@ class _SectionAccessible(_InterfaceSection):
       r_type_name = r_type_name.replace('_', ' ').lower().capitalize()
       iter = self.relations_model.append(
           None, [None, 
-                 '<i>'+markup_escape_text(r_type_name)+'</i>', -1, 
+                 '<i>'+markup_escape_text(r_type_name, len(r_type_name))+'</i>', -1, 
                  self.header_bg, False])
       for i in range(relation.getNTargets()):
         acc = relation.getTarget(i)
         self.relations_model.append(
             iter, [getIcon(acc), 
-                   markup_escape_text(acc.name), i, 
+                   markup_escape_text(acc.name, len(acc.name)), i, 
                    self.relation_bg, True])
     self.relations_view.expand_all()
 

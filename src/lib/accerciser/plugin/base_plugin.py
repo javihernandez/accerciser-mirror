@@ -248,9 +248,10 @@ class ViewportPlugin(Plugin, gtk.ScrolledWindow):
 
     adj = self.viewport.get_vadjustment()
     if y+h > vh:
-      adj.value += min((y+h) - vh + 2, y)
+      value = adj.get_value() + min((y+h) - vh + 2, y)
+      adj.set_value(value)
     elif y < 0:
-      adj.value = max(adj.value + y - 2, adj.lower)
+      adj.set_value(max(adj.get_value() + y - 2, adj.get_lower()))
 
   def _onMessageResponse(self, error_message, response_id):
     '''

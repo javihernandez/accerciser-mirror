@@ -14,12 +14,12 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 import gi
 
 from gi.repository import Gtk as gtk
+from gi.repository import GObject
 
-import gobject
 import pango
 from accerciser.i18n import _
 
-class MessageManager(gobject.GObject):
+class MessageManager(GObject.GObject):
   '''
   Centralizes all plugin message handling. If the plugin is a visible widget,
   it displays the message within the plugin. If not it displays the message in
@@ -29,21 +29,21 @@ class MessageManager(gobject.GObject):
   responses to messages.
   '''
   __gsignals__ = {'plugin-reload-request' :
-                    (gobject.SIGNAL_RUN_FIRST,
-                     gobject.TYPE_NONE, 
-                     (gobject.TYPE_PYOBJECT,
-                      gobject.TYPE_PYOBJECT)),
+                    (GObject.SignalFlags.RUN_FIRST,
+                     None, 
+                     (GObject.TYPE_PYOBJECT,
+                      GObject.TYPE_PYOBJECT)),
                   'module-reload-request' :
-                    (gobject.SIGNAL_RUN_FIRST,
-                     gobject.TYPE_NONE, 
-                     (gobject.TYPE_PYOBJECT,
-                      gobject.TYPE_STRING,
-                      gobject.TYPE_STRING))}
+                    (GObject.SignalFlags.RUN_FIRST,
+                     None, 
+                     (GObject.TYPE_PYOBJECT,
+                      GObject.TYPE_STRING,
+                      GObject.TYPE_STRING))}
   def __init__(self):
     '''
     Initialize the manager.
     '''
-    gobject.GObject.__init__(self)
+    GObject.GObject.__init__(self)
     self.message_tab = None
 
   def getMessageTab(self):
@@ -202,9 +202,9 @@ class PluginMessage(gtk.Frame):
   @type message_style: gtk.Style
   '''
   __gsignals__ = {'response' : 
-                  (gobject.SIGNAL_RUN_FIRST,
-                   gobject.TYPE_NONE, 
-                   (gobject.TYPE_INT,))}
+                  (GObject.SignalFlags.RUN_FIRST,
+                   None, 
+                   (GObject.TYPE_INT,))}
   def __init__(self):
     '''
     Initialize the message object.

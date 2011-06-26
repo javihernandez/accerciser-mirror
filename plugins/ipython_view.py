@@ -16,8 +16,8 @@ import gi
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
+from gi.repository import GObject
 
-import gobject
 import re
 import sys
 import os
@@ -283,7 +283,7 @@ class ConsoleView(gtk.TextView):
     self.connect('key-press-event', self.onKeyPress)
     
   def write(self, text, editable=False):
-    gobject.idle_add(self._write, text, editable)
+    GObject.idle_add(self._write, text, editable)
 
   def _write(self, text, editable=False):
     '''
@@ -317,7 +317,7 @@ class ConsoleView(gtk.TextView):
 
 
   def showPrompt(self, prompt):
-    gobject.idle_add(self._showPrompt, prompt)
+    GObject.idle_add(self._showPrompt, prompt)
 
   def _showPrompt(self, prompt):
     '''
@@ -331,7 +331,7 @@ class ConsoleView(gtk.TextView):
                                self.text_buffer.get_end_iter())
 
   def changeLine(self, text):
-    gobject.idle_add(self._changeLine, text)
+    GObject.idle_add(self._changeLine, text)
 
   def _changeLine(self, text):
     '''
@@ -358,7 +358,7 @@ class ConsoleView(gtk.TextView):
     return rv
 
   def showReturned(self, text):
-    gobject.idle_add(self._showReturned, text)
+    GObject.idle_add(self._showReturned, text)
 
   def _showReturned(self, text):
     '''

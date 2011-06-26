@@ -17,10 +17,10 @@ import gi
 from gi.repository import Gtk as gtk
 from gi.repository import GdkPixbuf
 from gi.repository import Wnck as wnck
+from gi.repository import GObject
 
 import sys, os, glob
 
-import gobject
 from pyatspi.constants import *
 
 ICONS_PATH = os.path.join(sys.prefix, 'share', 
@@ -43,7 +43,7 @@ def getIcon(acc):
       # try the theme first
       try:
         return theme.load_icon(acc.name, 24, gtk.IconLookupFlags.USE_BUILTIN)
-      except gobject.GError:
+      except GObject.GError:
         pass
       # then try wnck
       s = wnck.Screen.get_default()
@@ -59,7 +59,7 @@ def getIcon(acc):
       try:
         fn = os.path.join(ICONS_PATH, '%s.png' % name)
         return GdkPixbuf.Pixbuf.new_from_file(fn)
-      except gobject.GError:
+      except GObject.GError:
         pass
   except Exception, e:
     pass

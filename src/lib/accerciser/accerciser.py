@@ -17,12 +17,12 @@ import gi
 
 from gi.repository import Gtk as gtk
 from gi.repository import Wnck as wnck
+from gi.repository import GObject
 from gi.repository import Atk as atk
 # TODO: If remove this print, a few lines below atk.RelationType doesn't have
 # setted its properties properly. Need to investigate this issue
 print dir(atk.RelationType)
 
-import gobject
 import os, sys, locale
 from icons import getIcon
 import os
@@ -110,7 +110,7 @@ class Main(Tools):
     '''
     # Tell user if desktop accessibility is disabled.
     self._showNoA11yDialog()
-    gobject.timeout_add(200, self._pumpEvents)
+    GObject.timeout_add(200, self._pumpEvents)
     try:
       pyatspi.Registry.start(async=True, gil=False)
     except KeyboardInterrupt:

@@ -14,9 +14,9 @@ import gi
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
+from gi.repository import GObject
 
 import pyatspi
-import gobject
 import os.path
 import gettext, os, sys, locale
 from accerciser.plugin import ViewportPlugin
@@ -115,7 +115,7 @@ class EventMonitor(ViewportPlugin):
       events.extend(sub_events)
     events = list(set([event.strip(':') for event in events]))
     events.sort()
-    gobject.idle_add(self._appendChildren, None, '', 0, events)
+    GObject.idle_add(self._appendChildren, None, '', 0, events)
 
   def _initTextView(self):
     '''
@@ -154,7 +154,7 @@ class EventMonitor(ViewportPlugin):
         iter = self.events_model.append(parent_iter, 
                                         [event.split(':')[-1],
                                          event, False, False])
-        gobject.idle_add(self._appendChildren, iter, event, level + 1, events)
+        GObject.idle_add(self._appendChildren, iter, event, level + 1, events)
     return False
         
   def _onToggled(self, renderer_toggle, path):

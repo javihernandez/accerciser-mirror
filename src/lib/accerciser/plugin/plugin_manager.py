@@ -15,7 +15,6 @@ import gi
 
 from gi.repository import Gtk as gtk
 
-import gobject
 from base_plugin import Plugin
 from view import ViewManager
 from accerciser.tools import Tools, GConfListWrapper, getTreePathBoundingBox

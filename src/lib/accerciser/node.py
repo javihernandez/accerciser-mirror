@@ -15,9 +15,9 @@ import gi
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
+from gi.repository import GObject
 
 import pyatspi
-import gobject
 import string
 import rsvg
 import cairo
@@ -45,7 +45,7 @@ class Bag(object):
   def __str__(self):
     return ', '.join(vars(self).keys())
 
-class Node(gobject.GObject, Tools):
+class Node(GObject.GObject, Tools):
   '''
   Node class that contains convient references to accessibility information 
   for the currently selected node. A L{Node} instance will emit an 
@@ -60,19 +60,19 @@ class Node(gobject.GObject, Tools):
   @type extents: L{Bag}
   '''
   __gsignals__ = {'accessible-changed' : 
-                  (gobject.SIGNAL_RUN_FIRST,
-                   gobject.TYPE_NONE, 
-                   (gobject.TYPE_PYOBJECT,)),
+                  (GObject.SignalFlags.RUN_FIRST,
+                   None, 
+                   (GObject.TYPE_PYOBJECT,)),
                   'blink-done' : 
-                  (gobject.SIGNAL_RUN_FIRST,
-                   gobject.TYPE_NONE, 
+                  (GObject.SignalFlags.RUN_FIRST,
+                   None, 
                    ())}
   def __init__(self):
     self.desktop = pyatspi.Registry.getDesktop(0)
     self.acc = None
     self.extents = None
     self.tree_path = None
-    gobject.GObject.__init__(self)
+    GObject.GObject.__init__(self)
     
   def update(self, acc):
     '''
@@ -157,7 +157,7 @@ class Node(gobject.GObject, Tools):
                                 gdk.CapStyle.BUTT, gdk.JoinStyle.MITER)
     self.inv = gtk.Invisible()
     self.inv.set_screen(screen)
-    gobject.timeout_add(30, self._drawRectangle)
+    GObject.timeout_add(30, self._drawRectangle)
 
   def _drawRectangle(self):
     '''
@@ -248,7 +248,7 @@ class _HighLight(gtk.Window):
     
   def highlight(self, duration=500):
     if duration > 0:
-      gobject.timeout_add(duration, lambda w: w.destroy(), self)
+      GObject.timeout_add(duration, lambda w: w.destroy(), self)
       self.show_all()
     else:
       self.destroy()
@@ -257,7 +257,7 @@ class _HighLight(gtk.Window):
     svgh = rsvg.Handle()
     try:
       svgh.write(self.svg)
-    except (gobject.GError, KeyError, ValueError), ex:
+    except (GObject.GError, KeyError, ValueError), ex:
       print 'Error reading SVG for display: %s\r\n%s', ex, self.svg
       svgh.close()
       return

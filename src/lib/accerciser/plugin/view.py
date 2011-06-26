@@ -10,12 +10,10 @@ All rights reserved. This program and the accompanying materials are made
 available under the terms of the BSD which accompanies this distribution, and 
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
-import gi
-
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
+from gi.repository import GObject
 
-import gobject
 from base_plugin import Plugin
 from accerciser.tools import *
 from message import MessageManager
@@ -45,14 +43,14 @@ class PluginView(gtk.Notebook):
   '''
 
   __gsignals__ = {'plugin_drag_end' : 
-                  (gobject.SIGNAL_RUN_FIRST,
-                   gobject.TYPE_NONE, 
-                   (gobject.TYPE_OBJECT,)),
+                  (GObject.SignalFlags.RUN_FIRST,
+                   None, 
+                   (GObject.TYPE_OBJECT,)),
                   'tab_popup_menu' : 	 
-                  (gobject.SIGNAL_RUN_FIRST, 	 
-                   gobject.TYPE_NONE, 	 
-                   (gobject.TYPE_PYOBJECT, 	 
-                    gobject.TYPE_OBJECT))}
+                  (GObject.SignalFlags.RUN_FIRST, 	 
+                   None, 	 
+                   (GObject.TYPE_PYOBJECT, 	 
+                    GObject.TYPE_OBJECT))}
   TARGET_PLUGINVIEW = 0
   TARGET_ROOTWIN = 1
   NOTEBOOK_GROUP = 1
@@ -312,8 +310,8 @@ class PluginViewWindow(gtk.Window, Tools):
         (GCONF_PLUGINVIEWS, 
          gconf.escape_key(view_name, len(view_name)))
     cl = gconf.client_get_default()
-    cl.set_int(key_prefix+'/width', self.allocation.width)
-    cl.set_int(key_prefix+'/height', self.allocation.height)
+    cl.set_int(key_prefix+'/width', self.get_allocated_width())
+    cl.set_int(key_prefix+'/height', self.get_allocated_height())
 
   def _onPluginRemoved(self, pluginview, page, page_num):
     '''
@@ -845,7 +843,7 @@ class MultiViewModel(list, BaseViewModel):
     @type view: :{PluginView}
     '''
     if isinstance(view.get_parent(), PluginViewWindow):
-      view.parent.connect('delete_event', Proxy(self._onViewDelete))
+      view.get_parent().connect('delete_event', Proxy(self._onViewDelete))
     view.connect('plugin_drag_end', Proxy(self._onPluginDragEnd))
     view.connect('tab_popup_menu', Proxy(self._onTabPopupMenu))
     view.connect('page_added', Proxy(self._onViewLayoutChanged), 'added')
