@@ -1,9 +1,7 @@
-import gi
-
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
+from gi.repository import GConf as gconf
 
-import gconf
 from plugin import PluginView
 from i18n import _, N_
 from accessible_treeview import *
@@ -44,7 +42,7 @@ class AccerciserMainWindow(gtk.Window):
     self.set_title(_('Accerciser Accessibility Explorer'))
     self.connect('key-press-event', self._onKeyPress)
     node.connect('blink-done', self._onBlinkDone)    
-    cl = gconf.client_get_default()
+    cl = gconf.Client.get_default()
     width = cl.get_int(GCONF_GENERAL+'/window_width') or 640
     height = cl.get_int(GCONF_GENERAL+'/window_height') or 640
     self.set_default_size(width, height)
@@ -105,7 +103,7 @@ class AccerciserMainWindow(gtk.Window):
     sw.add(self.treeview)
     self._hpaned.add1(sw)
 
-    cl = gconf.client_get_default()
+    cl = gconf.Client.get_default()
     for paned in (self._vpaned, self._hpaned):
       if not cl.get(GCONF_GENERAL+'/'+paned.get_name()): continue
       paned_position = cl.get_int(GCONF_GENERAL+'/'+paned.get_name())
@@ -166,7 +164,7 @@ class AccerciserMainWindow(gtk.Window):
     '''
     Save the dimensions of the main window, and the position of the panes.
     '''
-    cl = gconf.client_get_default()
+    cl = gconf.Client.get_default()
     cl.set_int(GCONF_GENERAL+'/window_width', self.get_allocated_width())
     cl.set_int(GCONF_GENERAL+'/window_height', self.get_allocated_height())
     cl.set_int(GCONF_GENERAL+'/hpaned', self._hpaned.get_position())

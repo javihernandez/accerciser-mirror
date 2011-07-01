@@ -12,15 +12,13 @@ available under the terms of the BSD which accompanies this distribution, and
 is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 
-import gi
-
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
 from gi.repository import GdkPixbuf
 from gi.repository import GObject
 
 import pyatspi
-import atk, os
+import os
 import ui_manager
 from icons import getIcon
 from node import Node

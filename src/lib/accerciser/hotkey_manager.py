@@ -14,8 +14,8 @@ import gi
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
+from gi.repository import GConf as gconf
 
-import gconf
 from i18n import _
 import pyatspi
 
@@ -57,7 +57,7 @@ class HotkeyManager(gtk.ListStore):
     '''
     gtk.ListStore.__init__(self, str, str, object, int, int, str)
     self.connect('row-changed', self._onComboChanged)
-    self.gconf_client = gconf.client_get_default()
+    self.gconf_client = gconf.Client.get_default()
 
     masks = [mask for mask in pyatspi.allModifiers()]
     pyatspi.Registry.registerKeystrokeListener(

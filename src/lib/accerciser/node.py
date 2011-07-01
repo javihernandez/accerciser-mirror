@@ -16,17 +16,17 @@ import gi
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
 from gi.repository import GObject
+from gi.repository import GConf as gconf
 
 import pyatspi
 import string
 import rsvg
 import cairo
 from tools import Tools, parseColorString
-import gconf
 
 MAX_BLINKS = 6
 
-cl = gconf.client_get_default()
+cl = gconf.Client.get_default()
 BORDER_COLOR, BORDER_ALPHA = parseColorString(
   cl.get_string('/apps/accerciser/highlight_border') or '#ff0000ff') 
 

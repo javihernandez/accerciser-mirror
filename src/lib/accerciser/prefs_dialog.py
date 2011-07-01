@@ -16,9 +16,9 @@ import gi
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
 from gi.repository import Atk as atk
+from gi.repository import GConf as gconf
 
 from i18n import _
-import gconf
 import node
 from tools import parseColorString
 
@@ -71,7 +71,7 @@ class _HighlighterView(gtk.Alignment):
   def __init__(self):
     gtk.Alignment.__init__(self)
     self.set_padding(12, 12, 18, 12)
-    self.gconf_cl = gconf.client_get_default()
+    self.gconf_cl = gconf.Client.get_default()
     self._buildUI()
 
   def _buildUI(self):
@@ -107,10 +107,8 @@ class _HighlighterView(gtk.Alignment):
 
     for label, control in zip(map(lambda x: x.get_accessible(),labels),
                               map(lambda x: x.get_accessible(),controls)):
-      #label.add_relationship(atk.RelationType.LABEL_FOR, control)
-      label.add_relationship(atk.RelationType(3), control)
-      #control.add_relationship(atk.RelationType.LABELLED_BY, label)
-      control.add_relationship(atk.RelationType(4), label)
+      label.add_relationship(atk.RelationType.LABEL_FOR, control)
+      control.add_relationship(atk.RelationType.LABELLED_BY, label)
 
   def _onDurationChanged(self, spin_button):
     '''

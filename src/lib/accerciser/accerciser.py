@@ -17,11 +17,12 @@ import gi
 
 from gi.repository import Gtk as gtk
 from gi.repository import Wnck as wnck
+from gi.repository import GConf as gconf
 from gi.repository import GObject
 from gi.repository import Atk as atk
 # TODO: If remove this print, a few lines below atk.RelationType doesn't have
 # setted its properties properly. Need to investigate this issue
-print dir(atk.RelationType)
+#print dir(atk.RelationType)
 
 import os, sys, locale
 from icons import getIcon
@@ -34,9 +35,7 @@ from plugin import PluginManager
 from plugin import PluginView
 from tools import Tools
 from i18n import _, N_
-import gconf
 from hotkey_manager import HotkeyManager, HotkeyTreeView
-import gconf
 from about_dialog import AccerciserAboutDialog
 from prefs_dialog import AccerciserPreferencesDialog
 from main_window import AccerciserMainWindow
@@ -126,7 +125,7 @@ class Main(Tools):
     be disabled. If desktop accessibility is disabled in gconf, prompts the
     user to enable it.
     '''
-    cl = gconf.client_get_default()
+    cl = gconf.Client.get_default()
     if not cl.get_bool('/desktop/gnome/interface/accessibility'):
       message = _('Accerciser could not see the applications on your desktop.  '
                   'You must enable desktop accessibility to fix this problem.  '
@@ -140,7 +139,7 @@ class Main(Tools):
   def _onNoA11yResponse(self, dialog, response_id):
     dialog.destroy()
     if response_id == gtk.ResponseType.YES:
-      cl = gconf.client_get_default()
+      cl = gconf.Client.get_default()
       cl.set_bool('/desktop/gnome/interface/accessibility', True)
       dialog = gtk.MessageDialog(
         self.window,

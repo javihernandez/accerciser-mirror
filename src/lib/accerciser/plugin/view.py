@@ -12,6 +12,7 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 '''
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
+from gi.repository import GConf as gconf
 from gi.repository import GObject
 
 from base_plugin import Plugin
@@ -21,7 +22,7 @@ import os
 import sys
 import imp
 from accerciser.i18n import _, N_
-import gconf, gc
+import gc
 from accerciser import ui_manager
 
 GCONF_PLUGINVIEWS = '/apps/accerciser/pluginviews'
@@ -283,7 +284,7 @@ class PluginViewWindow(gtk.Window, Tools):
     self.plugin_view = PluginView(view_name)
     self.add(self.plugin_view)
 
-    cl = gconf.client_get_default()
+    cl = gconf.Client.get_default()
     escaped_view_name = '/%s' % gconf.escape_key(view_name, len(view_name))
     width = cl.get_int(GCONF_PLUGINVIEWS+escaped_view_name+'/width') or 480
     height = cl.get_int(GCONF_PLUGINVIEWS+escaped_view_name+'/height') or 480
@@ -309,7 +310,7 @@ class PluginViewWindow(gtk.Window, Tools):
     key_prefix = '%s/%s' % \
         (GCONF_PLUGINVIEWS, 
          gconf.escape_key(view_name, len(view_name)))
-    cl = gconf.client_get_default()
+    cl = gconf.Client.get_default()
     cl.set_int(key_prefix+'/width', self.get_allocated_width())
     cl.set_int(key_prefix+'/height', self.get_allocated_height())
 
@@ -358,7 +359,7 @@ class ViewManager(object):
     @type perm_views: list of {PluginView}
     '''
     self._perm_views = perm_views
-    cl = gconf.client_get_default()
+    cl = gconf.Client.get_default()
     single = cl.get_bool(GCONF_LAYOUT_SINGLE)
     self._initViewModel(single)
     self._setupActions()
@@ -400,7 +401,7 @@ class ViewManager(object):
     '''
     if isinstance(self._view_model, SingleViewModel) == single:
       return
-    cl = gconf.client_get_default()
+    cl = gconf.Client.get_default()
     cl.set_bool(GCONF_LAYOUT_SINGLE, single)
     plugins = self._view_model.getViewedPlugins()
     self._view_model.close()
@@ -1131,7 +1132,7 @@ class MultiViewModel(list, BaseViewModel):
     view layout lists.
     '''
     def __init__(self):
-      self.gconf_client = gconf.client_get_default()
+      self.gconf_client = gconf.Client.get_default()
     def __len__(self):
       view_dirs = self.gconf_client.all_dirs(GCONF_PLUGINVIEWS)
       return len(view_dirs)

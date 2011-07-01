@@ -14,6 +14,7 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 import gi
 
 from gi.repository import Gtk as gtk
+from gi.repository import GConf as gconf
 
 from base_plugin import Plugin
 from view import ViewManager
@@ -23,7 +24,6 @@ import os
 import sys
 import imp
 import traceback
-import gconf
 from accerciser.i18n import _, N_, C_
 
 GCONF_PLUGIN_DISABLED = '/apps/accerciser/disabled_plugins'      
@@ -169,6 +169,7 @@ class PluginManager(gtk.ListStore, Tools):
         iter_id = self.append([None, plugin_locals[symbol], plugin_dir])
         self.handler_unblock(self._row_changed_handler)
         # if a plugin class is found, initialize
+        #print GConfListWrapper(GCONF_PLUGIN_DISABLED)
         enabled = plugin_locals[symbol].plugin_name not in \
             GConfListWrapper(GCONF_PLUGIN_DISABLED)
         if enabled:
