@@ -84,6 +84,7 @@ class PluginView(gtk.Notebook):
     @type event: gtk.dk.Event
     '''
     plugin = self._getClickedPlugin(event.x_root, event.y_root)
+    print plugin
     if plugin and event.button == 3:
       self.emit('tab_popup_menu', event, plugin)
 
@@ -120,6 +121,8 @@ class PluginView(gtk.Notebook):
       # TODO-JH: Don't really know if this is correct
       if tab != None and tab.get_state_flags() & tab.get_mapped():
         x, y, w, h = self.getTabAlloc(tab)
+        print event_x, event_y
+        print x,y,w,h
         if event_x >= x and \
               event_x <= x + w and \
               event_y >= y and \
@@ -138,12 +141,13 @@ class PluginView(gtk.Notebook):
     @rtype: tuple
     '''
     gdk_window = widget.get_window()
-    origin_x, origin_y, origin_z = gdk_window.get_origin()
+    origin_z, origin_x, origin_y = gdk_window.get_origin()
     alloc = widget.get_allocation()
     x, y, width, height = \
         alloc.x, alloc.y, alloc.width, alloc.height
     # TODO-JH: Review this conversion
-    if widget.get_state_flags() & widget.get_has_window():
+    has_window = not(widget.get_has_window())
+    if bool(widget.get_state_flags().value_names) & has_window:
       origin_x += x
       origin_y += y
     return origin_x, origin_y, width, height
@@ -827,14 +831,14 @@ class MultiViewModel(list, BaseViewModel):
     '''
     menu = self.Menu(plugin, view.get_toplevel())
     if hasattr(event, 'button'):
-      menu.popup(None, None, None, event.button, event.time)
+      menu.popup(None, None, None, None, event.button, event.time)
     else:
       tab = view.get_tab_label(plugin)
       x, y, w, h = view.getTabAlloc(tab)
       rect = gdk.Rectangle(x, y, w, h)
       menu.popup(None, None, 
                  lambda m, r: (r.x+r.width/2, r.y+r.height/2, True), 
-                 0, event.time, rect)
+                 rect, 0, event.time)
   
   def _connectSignals(self, view):
     '''
@@ -1024,20 +1028,17 @@ class MultiViewModel(list, BaseViewModel):
       '''
       menu_item = None
       for view in self.view_manager:
-        # TODO: pygtk-pygi - Check differerences 
-        #menu_item = gtk.RadioMenuItem(menu_item, view.view_name)
-        menu_item = gtk.RadioMenuItem()
+        menu_item = gtk.RadioMenuItem(label = view.view_name)
         menu_item.set_name(view.view_name)
         menu_item.connect('toggled', self._onItemToggled, view, context_plugin)
-        menu_item.set_active(view == context_plugin.parent)
+        menu_item.set_active(view == context_plugin.get_parent())
         self.append(menu_item)
         menu_item.show()
       menu_item = gtk.SeparatorMenuItem()
       self.append(menu_item)
       menu_item.show()
-      menu_item = gtk.MenuItem(name=_('<i>_New view...</i>'))
-      # TODO: pygtk-pygi - Check differerences 
-      #menu_item.child.set_use_markup(True)
+      menu_item = gtk.MenuItem(label=_('<i>_New view...</i>'))
+      menu_item.get_child().set_use_markup(True)
       menu_item.connect('activate', self._onItemActivated, 
                         context_plugin, transient_window)
       self.append(menu_item)
@@ -1105,6 +1106,7 @@ class MultiViewModel(list, BaseViewModel):
         self.entry = gtk.Entry()
         self.entry.set_completion(completion)
         self.entry.connect('activate', self._onEntryActivate)
+        self.vbox = self.get_children()[0]
         self.vbox.add(self.entry)
         self.entry.show()
 
