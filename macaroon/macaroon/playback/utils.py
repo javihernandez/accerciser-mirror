@@ -11,9 +11,10 @@
 
 # Headers in this file shall remain intact.
 
-import pyatspi, gtk
+from gi.repository import Gdk
+import pyatspi
 
-keymap = gtk.gdk.keymap_get_default()
+keymap = Gdk.Keymap.get_default()
 
 def getKeyCodeFromVal(keyval):
   global keymap
