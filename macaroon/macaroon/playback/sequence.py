@@ -53,7 +53,7 @@ class MacroSequence(GObject.GObject):
     '''
     Initialize L{MacroSequence}.
     '''
-    self.__gobject_init__()
+    super(MacroSequence, self).__init__()
     self._loop = None
     self._verbose = False
     self._current_step = 0

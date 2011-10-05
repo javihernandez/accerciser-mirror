@@ -16,6 +16,7 @@ Headers in this file shall remain intact.
 '''
 
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GObject
 import pyatspi
 

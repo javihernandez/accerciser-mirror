@@ -18,7 +18,8 @@ keymap = Gdk.Keymap.get_default()
 
 def getKeyCodeFromVal(keyval):
   global keymap
-  entry = keymap.get_entries_for_keyval(keyval)
+  success, entry = keymap.get_entries_for_keyval(keyval)
+  print entry
   if not entry:
     raise TypeError("Invalid key name")
   else:

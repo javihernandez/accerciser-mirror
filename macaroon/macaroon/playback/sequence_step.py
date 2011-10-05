@@ -37,7 +37,7 @@ class SequenceStep(GObject.GObject):
     '''
     Initialize L{SequenceStep}.
     '''
-    self.__gobject_init__()
+    super(SequenceStep, self).__init__()
     self.done = False
 
   def stepDone(self):
