@@ -60,15 +60,15 @@ class AccerciserMainWindow(gtk.Window):
     @param node: Main application's node.
     @type node: L{Node}
     '''
-    main_vbox = gtk.VBox()
+    main_grid = gtk.Grid()
     menu_bar = ui_manager.uimanager.get_widget(ui_manager.MAIN_MENU_PATH)
-    main_vbox.pack_start(menu_bar, False, True, 0)
+    main_grid.attach(menu_bar, 0, 0, 1, 1)
     self._vpaned = gtk.Paned.new(gtk.Orientation.VERTICAL)
     self._vpaned.set_position(350)
     self._vpaned.set_name('vpaned')
-    main_vbox.pack_start(self._vpaned, True, True, 0)
+    main_grid.attach(self._vpaned, 0, 1, 1, 1)
     self.statusbar = gtk.Statusbar()
-    main_vbox.pack_start(self.statusbar, False, True, 0)
+    main_grid.attach(self.statusbar, 0, 2, 1, 1)
     self._hpaned = gtk.Paned.new(gtk.Orientation.HORIZONTAL)
     self._hpaned.set_position(250)
     self._hpaned.set_name('hpaned')
@@ -109,7 +109,7 @@ class AccerciserMainWindow(gtk.Window):
       paned.set_position(paned_position)
       paned.set_data('last_position', paned.get_position())
 
-    self.add(main_vbox)
+    self.add(main_grid)
 
   def _onBottomPanelChange(self, pluginview, page, page_num, action):
     '''
